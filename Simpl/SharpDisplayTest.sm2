@@ -1280,6 +1280,8 @@ Hi=1
 ObjTp=Et
 H=1
 DvH=551
+IPM=255.255.255.0
+IPA=127.0.0.2
 ]
 [
 ObjTp=Sm

@@ -46,6 +46,7 @@ namespace Epi.Display.Sharp.SharpDisplayPluginDeviceClasses
             Enabled = DeviceConfig.Enabled;
             Protocol = DeviceConfig.Protocol;
 
+            // Set feedbacks.
             InputActiveFeedback = new IntFeedback(() => InputActive);
             InputActiveNameFeedback = new StringFeedback(() => InputName);
             PowerIsOnFeedback = new BoolFeedback(() => PowerIsOn);
@@ -81,17 +82,20 @@ namespace Epi.Display.Sharp.SharpDisplayPluginDeviceClasses
 
         #endregion
 
+
         #region IHasInput Members
 
         public abstract void SelectInput(ushort input);
 
         #endregion
 
+
         #region IHasPowerToggle Members
 
         public abstract void PowerToggle();
 
         #endregion
+
 
         public abstract void PollPower();
 

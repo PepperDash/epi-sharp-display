@@ -62,10 +62,10 @@ namespace Epi.Display.Sharp.SharpDisplayPluginDeviceClasses
             Regex ResponseParam = new Regex(@"\d+");
 
             Debug.Console(2, "Response Recieved: {0}", feedback);
-            
-            
+
+
             var Response = feedback.TrimEnd(SplitChar);
-            
+
 
             Match Command = ResponseType.Match(Response);
             Match Parameters = ResponseParam.Match(Response);
@@ -74,7 +74,7 @@ namespace Epi.Display.Sharp.SharpDisplayPluginDeviceClasses
             Debug.Console(2, "Regex Parameters: {0} : {1}", Parameters.ToString(), Parameters.Success);
 
             if (Command.Success && Parameters.Success)
-            {          
+            {
                 if (Command.ToString().Contains("POWR"))
                 {
                     if (Parameters.ToString().Contains("1"))

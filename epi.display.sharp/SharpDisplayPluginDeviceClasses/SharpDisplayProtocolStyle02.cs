@@ -56,27 +56,34 @@ namespace Epi.Display.Sharp.SharpDisplayPluginDeviceClasses
         {
             Regex ResponseType = new Regex("[a-zA-Z]{4}");
             Regex ResponseParam = new Regex(@"\d+");
-            
-            
+
+            Debug.Console(2, "Response Recieved: {0}", feedback);
+
+
             var Response = feedback.TrimEnd(SplitChar);
-            
+
 
             Match Command = ResponseType.Match(Response);
             Match Parameters = ResponseParam.Match(Response);
 
+            Debug.Console(2, "Regex Command: {0} : {1}", Command.ToString(), Command.Success);
+            Debug.Console(2, "Regex Parameters: {0} : {1}", Parameters.ToString(), Parameters.Success);
+
             if (Command.Success && Parameters.Success)
-            {          
+            {
                 if (Command.ToString().Contains("POWR"))
                 {
                     if (Parameters.ToString().Contains("1"))
                     {
                         PowerIsOn = true;
                         PowerIsOnFeedback.FireUpdate();
+                        Debug.Console(2, "Power Is ON");
                     }
                     else
                     {
                         PowerIsOn = false;
                         PowerIsOnFeedback.FireUpdate();
+                        Debug.Console(2, "Power Is OFF");
                     }
                 }
                 else if (Command.ToString().Contains("IAVD"))
@@ -95,6 +102,8 @@ namespace Epi.Display.Sharp.SharpDisplayPluginDeviceClasses
                         InputActive = (int) eInput.DsubRgb;
                     else if(Parameters.ToString() == InputParam.DsubVideo)
                         InputActive = (int) eInput.DsubVideo;
+
+                    Debug.Console(2, "Input is: {0}", InputActive);
 
                     InputActiveFeedback.FireUpdate();
                     InputActiveNameFeedback.FireUpdate();

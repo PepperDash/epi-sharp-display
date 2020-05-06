@@ -45,11 +45,16 @@ namespace Epi.Display.Sharp
             trilist.SetSigTrueAction(joinMap.PowerOn.JoinNumber, () => device.PowerOn());
             trilist.SetSigTrueAction(joinMap.PowerOff.JoinNumber, () => device.PowerOff());
             trilist.SetSigTrueAction(joinMap.PowerToggle.JoinNumber, () => device.PowerToggle());
+            trilist.SetSigTrueAction(joinMap.PollStart.JoinNumber, () => device.PollStart());
+            trilist.SetSigTrueAction(joinMap.PollStop.JoinNumber, () => device.PollStop());
             trilist.SetUShortSigAction(joinMap.Input.JoinNumber, (value) => device.SelectInput(value));
+            trilist.SetUShortSigAction(joinMap.PollTime.JoinNumber, (value) => device.PollSetTime(value));
 
             Debug.Console(2, "Linking Feedbacks");
             device.PowerIsOnFeedback.LinkInputSig(trilist.BooleanInput[joinMap.PowerOn.JoinNumber]);
             device.PowerIsOnFeedback.LinkComplementInputSig(trilist.BooleanInput[joinMap.PowerOff.JoinNumber]);
+            device.PollIsStartedFeedback.LinkInputSig(trilist.BooleanInput[joinMap.PollStart.JoinNumber]);
+            device.PollIsStartedFeedback.LinkComplementInputSig(trilist.BooleanInput[joinMap.PollStop.JoinNumber]);
             device.InputActiveFeedback.LinkInputSig(trilist.UShortInput[joinMap.Input.JoinNumber]);
 
             Debug.Console(2, "Linking Complete");
@@ -98,12 +103,39 @@ namespace Epi.Display.Sharp
                 JoinType = eJoinType.Digital
             });
 
+        [JoinName("pollStart")]
+        public JoinDataComplete PollStart = new JoinDataComplete(new JoinData { JoinNumber = 4, JoinSpan = 1 },
+            new JoinMetadata
+            {
+                Label = "Poll Start",
+                JoinCapabilities = eJoinCapabilities.ToFromSIMPL,
+                JoinType = eJoinType.Digital
+            });
+
+        [JoinName("pollStop")]
+        public JoinDataComplete PollStop = new JoinDataComplete(new JoinData { JoinNumber = 5, JoinSpan = 1 },
+            new JoinMetadata
+            {
+                Label = "Poll Stop",
+                JoinCapabilities = eJoinCapabilities.ToFromSIMPL,
+                JoinType = eJoinType.Digital
+            });
+
         [JoinName("input")]
         public JoinDataComplete Input = new JoinDataComplete(new JoinData { JoinNumber = 1, JoinSpan = 1 },
             new JoinMetadata
             {
                 Label = "Input",
                 JoinCapabilities = eJoinCapabilities.ToFromSIMPL,
+                JoinType = eJoinType.Analog
+            });
+
+        [JoinName("pollTime")]
+        public JoinDataComplete PollTime = new JoinDataComplete(new JoinData { JoinNumber = 2, JoinSpan = 1 },
+            new JoinMetadata
+            {
+                Label = "Poll Time",
+                JoinCapabilities = eJoinCapabilities.FromSIMPL,
                 JoinType = eJoinType.Analog
             });
 

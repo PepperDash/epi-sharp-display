@@ -11,6 +11,7 @@ namespace Epi.Display.Sharp
     {
         internal static SharpDisplayBase BuildSharpDislplay(SharpDisplayPluginDevice display, SharpDisplayPluginConfigObject displayConfig)
         {
+            // Get config value for protocol style and return protocol
             if (displayConfig.Protocol == "ProtocolStyle01")
                 return new SharpDisplayProtocolStyle01(display, displayConfig);
             if (displayConfig.Protocol == "ProtocolStyle02")

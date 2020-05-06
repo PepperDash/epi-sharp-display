@@ -30,6 +30,7 @@ namespace Epi.Display.Sharp
         public GenericCommunicationMonitor CommunicationMonitor { get; private set; }
 
         public BoolFeedback PowerIsOnFeedback { get; protected set; }
+        public BoolFeedback PollIsStartedFeedback { get; protected set; }
         public IntFeedback InputActiveFeedback { get; protected set; }
         public StringFeedback InputActiveNameFeedback { get; protected set; }
 
@@ -52,9 +53,11 @@ namespace Epi.Display.Sharp
             Config = config;
             Communication = comms;
             
+            // Check config for protocol type and get correct protocol
             var RetreiveSharpDisplay = SharpDisplayPluginProtocolStyleFactory.BuildSharpDislplay(this, Config);
             if (RetreiveSharpDisplay != null)
             {
+                // A valid protocol retreived.
                 Display = RetreiveSharpDisplay;
                 Debug.Console(2, this, "Added Display Name: {0}, Type: {1}, Comm: {2}", Display.Name, Display.GetType().ToString(),Communication.GetType().ToString());
 
@@ -62,6 +65,7 @@ namespace Epi.Display.Sharp
                 PortGather = new CommunicationGather(Communication, Display.Delimiter);
                 PortGather.LineReceived += PortGather_LineReceived;
 
+                // if Comm type is com it is serial, otherwise it is tcp or ssh... sets the correct value for RSPW command
                 if (Communication.GetType().ToString().Contains("com"))
                     CommMethod = 1;
                 else
@@ -70,12 +74,14 @@ namespace Epi.Display.Sharp
                 CommunicationMonitor = new GenericCommunicationMonitor(this, Communication, 20000, 120000, 300000, Display.PollString);
                 CommunicationMonitor.Start();
 
+                // Attach to display feedbacks here
                 PowerIsOnFeedback = Display.PowerIsOnFeedback;
                 InputActiveFeedback = Display.InputActiveFeedback;
 
-                
-
+                // Set up polling
                 DisplayPoll = new SharpDisplayPluginPoll(300000);
+
+                PollIsStartedFeedback = DisplayPoll.PollIsEnabledFeedback;
 
                 Initialize();
             }
@@ -90,11 +96,13 @@ namespace Epi.Display.Sharp
         public void Initialize()
         {
             Debug.Console(2, this, "Initializing");
+            // Subscribe to poll event
             DisplayPoll.Poll += OnPoll;
         }
 
         void PortGather_LineReceived(object sender, GenericCommMethodReceiveTextArgs e)
         {
+            //Send feedback to display for parsing.
             Display.ParseFeedback(e.Text);    
         }
 
@@ -115,9 +123,9 @@ namespace Epi.Display.Sharp
             DisplayPoll.StopPoll();
         }
 
-        public void PollSetTime(long pollTime)
+        public void PollSetTime(ushort pollTime)
         {
-            DisplayPoll.PollTime = pollTime;
+            DisplayPoll.PollTime = pollTime * 1000;
         }
         #endregion
 

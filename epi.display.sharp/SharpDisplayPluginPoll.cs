@@ -5,6 +5,7 @@ using System.Text;
 using Crestron.SimplSharp;
 using Epi.Display.Sharp.DisplayEventArgs;
 using PepperDash.Core;
+using PepperDash.Essentials.Core;
 
 namespace Epi.Display.Sharp
 {
@@ -12,8 +13,10 @@ namespace Epi.Display.Sharp
     {
         public long PollTime { get; set; }
         private CTimer PollTimer;
-        private bool PollingEnabled;
+        public bool PollingEnabled;
         private string PollTypeCurrent;
+
+        public BoolFeedback PollIsEnabledFeedback;
 
         public List<string> DisplayPollTypesEnabled;
 
@@ -25,6 +28,8 @@ namespace Epi.Display.Sharp
             PollTypeCurrent = "";
             PollTime = pollTime;
             DisplayPollTypesEnabled = new List<string> { "power", "input" };
+
+            PollIsEnabledFeedback = new BoolFeedback(() => PollingEnabled);
         }
 
 
@@ -36,6 +41,7 @@ namespace Epi.Display.Sharp
                 PollTimer.Dispose();
 
             PollingEnabled = true;
+            PollIsEnabledFeedback.FireUpdate();
 
             PollTimer = new CTimer(PollTimerExpired, PollTime);
         }
@@ -45,6 +51,7 @@ namespace Epi.Display.Sharp
             Debug.Console(2, "Poll Stopped");
             PollTimer.Stop();
             PollingEnabled = false;
+            PollIsEnabledFeedback.FireUpdate();
         }
 
         private void PollTimerExpired(object state)
