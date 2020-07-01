@@ -58,7 +58,7 @@ namespace Epi.Display.Sharp.SharpDisplayPluginDeviceClasses
 
         public override void ParseFeedback(string feedback)
         {
-            Regex ResponseType = new Regex("[a-zA-Z]{4}");
+            Regex ResponseType = new Regex("[a-zA-Z]\\S*");
             Regex ResponseParam = new Regex(@"\d+");
 
             Debug.Console(2, "Response Recieved: {0}", feedback);
@@ -73,9 +73,9 @@ namespace Epi.Display.Sharp.SharpDisplayPluginDeviceClasses
             Debug.Console(2, "Regex Command: {0} : {1}", Command.ToString(), Command.Success);
             Debug.Console(2, "Regex Parameters: {0} : {1}", Parameters.ToString(), Parameters.Success);
 
-            if (Command.Success && Parameters.Success)
+            if (Command.Success)
             {          
-                if (Command.ToString().Contains("POWR"))
+                if (Command.ToString().Contains("POWR") && Parameters.Success)
                 {
                     if (Parameters.ToString().Contains("1"))
                     {
@@ -90,7 +90,7 @@ namespace Epi.Display.Sharp.SharpDisplayPluginDeviceClasses
                         Debug.Console(2, "Power Is OFF");
                     }
                 }
-                else if (Command.ToString().Contains("IAVD"))
+                else if (Command.ToString().Contains("IAVD") && Parameters.Success)
                 {
                     if (Parameters.ToString() == InputParam.Hdmi1)
                         InputActive = (int)eInput.Hdmi1;
@@ -112,56 +112,17 @@ namespace Epi.Display.Sharp.SharpDisplayPluginDeviceClasses
                     InputActiveFeedback.FireUpdate();
                     InputActiveNameFeedback.FireUpdate();
                 }
+                else if (Command.ToString().Contains("OK"))
+                {
+
+                }
                 
             }
 
         }
 
-        public override void PowerOn()
-        {
-            DisplayDevice.SendLine("POWR   1");
-        }
+       
 
-        public override void PowerOff()
-        {
-            CommandSettingOn();
-            DisplayDevice.SendLine("POWR   0");
-        }
-
-        public override void PowerToggle()
-        {
-            if (PowerIsOn)
-            {
-                CommandSettingOn();
-                DisplayDevice.SendLine("POWR   0");
-            }
-            else
-            {
-                DisplayDevice.SendLine("POWR   1");
-            }
-        }
-
-        public override void SelectInput(ushort input)
-        {
-            DisplayDevice.SendLine(string.Format("IAVD   {0}", input));
-        }
-
-        public override void PollPower()
-        {
-            DisplayDevice.SendLine("POWR   ?");
-        }
-
-        public override void PollInput()
-        {
-            DisplayDevice.SendLine("IAVD   ?");
-        }
-
-
-
-        public override void CommandSettingOn()
-        {
-            DisplayDevice.SendLine(string.Format("RSPW   {0}", DisplayDevice.CommMethod));
-        }
 
         public override string ToString()
         {

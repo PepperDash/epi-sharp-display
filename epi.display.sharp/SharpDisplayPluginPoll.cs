@@ -32,6 +32,18 @@ namespace Epi.Display.Sharp
             PollIsEnabledFeedback = new BoolFeedback(() => PollingEnabled);
         }
 
+        public SharpDisplayPluginPoll(long pollTime, string[] enable)
+        {
+            PollingEnabled = false;
+            PollTypeCurrent = "";
+            PollTime = pollTime;
+            DisplayPollTypesEnabled = new List<string>();
+
+            DisplayPollTypesEnabled.AddRange(enable);
+
+            PollIsEnabledFeedback = new BoolFeedback(() => PollingEnabled);
+        }
+
 
         public void StartPoll()
         {

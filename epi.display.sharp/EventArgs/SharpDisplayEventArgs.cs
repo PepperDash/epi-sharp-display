@@ -15,4 +15,14 @@ namespace Epi.Display.Sharp.DisplayEventArgs
             CurrentEvent = currentEvent;
         }
     }
+
+    public class SharpDisplayMessageEventArgs : EventArgs
+    {
+        public string Response { get; set; }
+
+        public SharpDisplayMessageEventArgs(string response)
+        {
+            Response = response;
+        }
+    }
 }

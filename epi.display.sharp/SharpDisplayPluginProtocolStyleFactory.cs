@@ -3,13 +3,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Crestron.SimplSharp;
-using Epi.Display.Sharp.SharpDisplayPluginDeviceClasses;
+using Epi.Display.Sharp.SharpDisplayPluginCmdStyleClasses;
 
 namespace Epi.Display.Sharp
 {
     public static class SharpDisplayPluginProtocolStyleFactory
     {
-        internal static SharpDisplayBase BuildSharpDislplay(SharpDisplayPluginDevice display, SharpDisplayPluginConfigObject displayConfig)
+        internal static SharpDisplayCmdStyleBase BuildSharpDislplay(SharpDisplayPluginDevice display, SharpDisplayPluginConfigObject displayConfig)
         {
             // Get config value for protocol style and return protocol
             if (displayConfig.Protocol == "ProtocolStyle01")

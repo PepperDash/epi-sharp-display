@@ -22,5 +22,4 @@ namespace Epi.Display.Sharp
     {
         void SelectInput(ushort input);
     }
-
 }

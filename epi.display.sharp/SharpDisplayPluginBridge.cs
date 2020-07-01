@@ -6,20 +6,22 @@ using PepperDash.Core;
 using PepperDash.Essentials.Bridges;
 using PepperDash.Essentials.Core;
 
-using Epi.Display.Sharp.SharpDisplayPluginDeviceClasses;
+using Epi.Display.Sharp.SharpDisplayProtocolCmdStyleClasses;
+using PepperDash.Essentials.Core.Bridges;
 
 
 namespace Epi.Display.Sharp
 {
 	public static class SharpDisplayPluginBridge
 	{
-		public static void LinkToApiExt(this SharpDisplayPluginDevice device, BasicTriList trilist, uint joinStart, string joinMapKey, EiscApi bridge)
+		public static void LinkToApiExt(this SharpDisplayPluginDevice device, BasicTriList trilist, uint joinStart, string joinMapKey, EiscApiAdvanced bridge)
 		{
 			SharpDisplayPluginBridgeJoinMap joinMap = new SharpDisplayPluginBridgeJoinMap(joinStart);
             joinMap.Init();
 
             // This adds the join map to the collection on the bridge
-            bridge.AddJoinMap(device.Key, joinMap);
+            if(bridge != null)
+                bridge.AddJoinMap(device.Key, joinMap);
 
             var customJoins = JoinMapHelper.TryGetJoinMapAdvancedForDevice(joinMapKey);
 
@@ -44,7 +46,7 @@ namespace Epi.Display.Sharp
 
             trilist.SetSigTrueAction(joinMap.PowerOn.JoinNumber, () => device.PowerOn());
             trilist.SetSigTrueAction(joinMap.PowerOff.JoinNumber, () => device.PowerOff());
-            trilist.SetSigTrueAction(joinMap.PowerToggle.JoinNumber, () => device.PowerToggle());
+            //trilist.SetSigTrueAction(joinMap.PowerToggle.JoinNumber, () => device.PowerToggle());
             trilist.SetSigTrueAction(joinMap.PollStart.JoinNumber, () => device.PollStart());
             trilist.SetSigTrueAction(joinMap.PollStop.JoinNumber, () => device.PollStop());
             trilist.SetUShortSigAction(joinMap.Input.JoinNumber, (value) => device.SelectInput(value));
