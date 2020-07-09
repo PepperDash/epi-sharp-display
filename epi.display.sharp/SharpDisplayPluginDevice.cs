@@ -23,17 +23,20 @@ using PepperDash.Essentials.Bridges;
 
 namespace Epi.Display.Sharp
 {
-
+    
     public enum eInputParams
     {
         Poll,
-        Hdmi1,
-        Hdmi2,
-        Hdmi3,
-        Hdmi4,
-        DsubRgb,
-        DsubComponent,
-        DsubVideo,
+        Input1,
+        Input2,
+        Input3,
+        Input4,
+        Input5,
+        Input6,
+        Input7,
+        Input8,
+        Input9,
+        Input10
     }
 
     public enum ePowerParams
@@ -66,9 +69,11 @@ namespace Epi.Display.Sharp
         public GenericCommunicationMonitor CommunicationMonitor { get; private set; }
 
         public BoolFeedback PowerIsOnFeedback { get; protected set; }
-        public BoolFeedback PollIsStartedFeedback { get; protected set; }
+        public BoolFeedback PollEnabledFeedback { get; protected set; }
         public IntFeedback InputActiveFeedback { get; protected set; }
         public StringFeedback InputActiveNameFeedback { get; protected set; }
+
+        public List<string> InputLabels;
 
         private SharpDisplayPluginPoll DisplayPoll;
 
@@ -78,9 +83,6 @@ namespace Epi.Display.Sharp
         SharpDisplayPluginQueue CommandQueue;
 
         SharpDisplayProtocolCmdStyleBase Display;
-
-        private char[] SplitChar = {',' , '\x0D'};
-        private SharpDisplayPluginMessage Command;
 
         public eCommMethod CommMethod { get; protected set; }
 
@@ -98,14 +100,12 @@ namespace Epi.Display.Sharp
 
             Config = config;
             Communication = comms;
-            
-            // Check config for protocol type and get correct protocol
-            var RetreiveSharpDisplay = SharpDisplayPluginProtocolCmdStyleFactory.BuildSharpDislplay(this, Config);
-            if (RetreiveSharpDisplay != null)
+
+            try
             {
+                Display = SharpDisplayPluginProtocolCmdStyleFactory.BuildSharpDislplay(this, Config);
                 // A valid protocol retreived.
-                Display = RetreiveSharpDisplay;
-                Debug.Console(2, this, "Added Display Name: {0}, Type: {1}, Comm: {2}", Config.Name, Display.GetType().ToString(),Communication.GetType().ToString());
+                Debug.Console(2, this, "Added Display Name: {0}, Type: {1}, Comm: {2}", Config.Name, Display.GetType().ToString(), Communication.GetType().ToString());
 
                 Delimiter = Display.Delimiter;
                 PortGather = new CommunicationGather(Communication, Delimiter);
@@ -128,21 +128,21 @@ namespace Epi.Display.Sharp
                 // Set up polling
                 DisplayPoll = new SharpDisplayPluginPoll(60000);
 
-                PollIsStartedFeedback = DisplayPoll.PollIsEnabledFeedback;
+                PollEnabledFeedback = DisplayPoll.PollEnabledFeedback;
 
                 Initialize();
             }
-            else
+            catch (NullReferenceException nEx)
             {
-                Debug.Console(2, this, "Sharp Protocol Type not valid");
-            }
-
-            
+                Debug.Console(2, Debug.ErrorLogLevel.Error, "Invalid Protocol, please check configuration file: {0}", nEx.ToString());
+            }       
 		}
 
         public void Initialize()
         {
             Debug.Console(2, this, "Initializing");
+
+            InputLabels = Display.GetInputs();
             // Subscribe to poll event
             DisplayPoll.Poll += OnPoll;
 
@@ -246,93 +246,110 @@ namespace Epi.Display.Sharp
        
         public void PowerOn()
         {
-            //TODO: Set up Command to send to Display protocol style for correct command format.
-
-            //var Cmd = "POWR   1";
-            var Cmd = Display.FormatPowerCommand(eCommands.Power, ePowerParams.On);
-            Debug.Console(2, "PowerOn: {0}", Cmd);
-            Command = new SharpDisplayPluginMessage(this, Cmd);
-            Command.SetResponseAction(SetPowerFb);
-            ExecuteCommand(Command);
+            Display.FormatCommand(eCommands.Power, ePowerParams.On);
         }
 
         public void PowerOff()
         {
-            //var Cmd = "POWR   0";
-            var Cmd = Display.FormatPowerCommand(eCommands.Power, ePowerParams.Off);
-            Debug.Console(2, "PowerOff: {0}", Cmd);
-            Command = new SharpDisplayPluginMessage(this, Cmd);
-            Command.SetResponseAction(SetPowerFb);
-            ExecuteCommand(Command);
+            Display.FormatCommand(eCommands.Power, ePowerParams.Off);
+        }
+
+        public void PowerToggle()
+        {
+            if (Display == null)
+            {
+                Debug.Console(2, this, Debug.ErrorLogLevel.Error, "Display not defined: Confirm Protocol configuration");
+                return;
+            }
+
+            if (PowerIsOn)
+                PowerOff();
+            else
+                PowerOn();
+        }
+
+        public void PowerPoll()
+        {
+            Display.FormatCommand(eCommands.Power, ePowerParams.Poll);
         }
 
         public void SelectInput(ushort input)
         {
-            //var Cmd = "INPS   ";
-            var Cmd = Display.FormatInputCommand(eCommands.Input, (eInputParams) input);
-            Debug.Console(2, "Input: {0}{1}, {2}", Cmd,input, (eInputParams) input);
-            Command = new SharpDisplayPluginMessage(this, string.Format("{0}{1}",Cmd, input));
-            Command.SetResponseAction(SetInputFb);
-            ExecuteCommand(Command);
+            Display.FormatCommand(eCommands.Input, (eInputParams) input);
+        }
+
+
+        public void InputPoll()
+        {
+            Display.FormatCommand(eCommands.Input, eInputParams.Poll);
         }
 
         public void CommandSettingOn()
         {
-            //var Cmd = "RSPW   1";
-            var Cmd = Display.FormatCommandSettingCommand(eCommands.CommandSetting, CommMethod);
-            Debug.Console(2, "Command Set: {0}", Cmd);
-            Command = new SharpDisplayPluginMessage(this, Cmd);
-            Command.SetResponseAction(null);
-            ExecuteCommand(Command);
+            Display.FormatCommand(eCommands.CommandSetting, ePowerParams.On);
         }
 
         public void ExecuteCommand(SharpDisplayPluginMessage command)
         {
-            
-
             if (CommandQueue.GetNextCommand() == null)
             {
                 SendLine(command.SendCommand());
                 CommandTimer.StartTimer(CommandTimeOut);
             }
             
-            Debug.Console(2, "Command Queued: {0} , {1}", this.Communication.GetType(), command.SendCommand());
+            Debug.Console(2, "Command Queued: {0}",command.SendCommand());
             CommandQueue.EnqueueMessage(command);
 
             CommandQueue.PrintQueue();
         }
 
-        private void SetPowerFb(string param)
+        public void SetPowerFb(string param)
         {
             var PowerState = false;
 
             Debug.Console(2, this, "Set Power FB: {0}", param);
             if(param.Contains("1"))
                 PowerState = true;
-
+            
             PowerIsOn = PowerState;
             PowerIsOnFeedback.FireUpdate();
 
         }
 
-        private void SetInputFb(string param)
+        public void SetInputFb(string param)
         {
             var Input = Int32.Parse(param);
             Debug.Console(2, this, "Set Input FB: {0}", param);
             try
             {
-                eInputParams inputE = (eInputParams)Input;
-                if (Display.InputParams.ContainsKey(inputE))
-                {
-                    InputActive = Int32.Parse(Display.InputParams[inputE]);
-                    InputActiveFeedback.FireUpdate();
-                }
+                    var Key = Display.InputList.FirstOrDefault(o => o.Value.InputCode == param);
+                    Debug.Console(2, this, "InputParams: {0}, as INT: {1}", Key, (int)Key.Key);
+                    if (!Key.IsDefault())
+                    {
+                        InputActive = (int)Key.Key;
+                        InputActiveFeedback.FireUpdate();
+                    }
             }
             catch
             {
                 CrestronConsole.PrintLine("No compatible Input found");
             }
 
+        }
+
+        public void PrintInputs()
+        {
+            if (Display == null)
+                return;
+
+            foreach (var input in Display.InputList)
+            {
+                if (input.Key > 0)
+                {
+                    Debug.Console(0, "Input: {0}, Name: {1}, InputCode: {2}", input.Key, input.Value.Name, input.Value.InputCode);
+                    InputLabels.Add(input.Value.Name);
+                }
+            }
         }
 
         #endregion
@@ -389,6 +406,16 @@ namespace Epi.Display.Sharp
         }
 
         #endregion
+    }
+
+    public static class Extensions
+    {
+        public static bool IsDefault<T>(this T value) where T : struct
+        {
+            bool isDefault = value.Equals(default(T));
+
+            return isDefault;
+        }
     }
 }
 

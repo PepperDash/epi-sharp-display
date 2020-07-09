@@ -16,7 +16,7 @@ namespace Epi.Display.Sharp
         public bool PollingEnabled;
         private string PollTypeCurrent;
 
-        public BoolFeedback PollIsEnabledFeedback;
+        public BoolFeedback PollEnabledFeedback;
 
         public List<string> DisplayPollTypesEnabled;
 
@@ -29,7 +29,7 @@ namespace Epi.Display.Sharp
             PollTime = pollTime;
             DisplayPollTypesEnabled = new List<string> { "power", "input" };
 
-            PollIsEnabledFeedback = new BoolFeedback(() => PollingEnabled);
+            PollEnabledFeedback = new BoolFeedback(() => PollingEnabled);
         }
 
         public SharpDisplayPluginPoll(long pollTime, string[] enable)
@@ -41,7 +41,7 @@ namespace Epi.Display.Sharp
 
             DisplayPollTypesEnabled.AddRange(enable);
 
-            PollIsEnabledFeedback = new BoolFeedback(() => PollingEnabled);
+            PollEnabledFeedback = new BoolFeedback(() => PollingEnabled);
         }
 
 
@@ -53,7 +53,7 @@ namespace Epi.Display.Sharp
                 PollTimer.Dispose();
 
             PollingEnabled = true;
-            PollIsEnabledFeedback.FireUpdate();
+            PollEnabledFeedback.FireUpdate();
 
             PollTimer = new CTimer(PollTimerExpired, PollTime);
         }
@@ -63,7 +63,7 @@ namespace Epi.Display.Sharp
             Debug.Console(2, "Poll Stopped");
             PollTimer.Stop();
             PollingEnabled = false;
-            PollIsEnabledFeedback.FireUpdate();
+            PollEnabledFeedback.FireUpdate();
         }
 
         private void PollTimerExpired(object state)

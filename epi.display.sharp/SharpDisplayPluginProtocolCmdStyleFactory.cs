@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Crestron.SimplSharp;
+using PepperDash.Core;
 using Epi.Display.Sharp.SharpDisplayProtocolCmdStyleClasses;
 
 namespace Epi.Display.Sharp
@@ -12,10 +13,15 @@ namespace Epi.Display.Sharp
         internal static SharpDisplayProtocolCmdStyleBase BuildSharpDislplay(SharpDisplayPluginDevice display, SharpDisplayPluginConfigObject displayConfig)
         {
             // Get config value for protocol style and return protocol
-            if (displayConfig.Protocol == "ProtocolStyle01")
-                return new SharpDisplayProtocolCmdStyle01();
 
-            return null;
+            switch (displayConfig.Protocol)
+            {
+                case ("ProtocolStyle01"):
+                    return new SharpDisplayProtocolCmdStyle01(display);
+                default:
+                    Debug.Console(0, "No Protocol Style Exists for Type");
+                    return new SharpDisplayProtocolCmdStyleNotDefined(display);
+            }
         }
     }
 }

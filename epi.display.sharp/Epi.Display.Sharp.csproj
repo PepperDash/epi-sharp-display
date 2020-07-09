@@ -96,8 +96,10 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CommandTimer\CommandTimer.cs" />
+    <Compile Include="Inputs\SharpDisplayPluginInput.cs" />
     <Compile Include="SharpDisplayPluginProtocolCmdStyleFactory.cs" />
     <Compile Include="EventArgs\SharpDisplayEventArgs.cs" />
+    <Compile Include="SharpDisplayProtocolCmdStyleClasses\SharpDisplayProtocolCmdStyleNotDefined.cs" />
     <Compile Include="SharpDisplayProtocolCmdStyleClasses\SharpDisplayProtocolCmdStyle01.cs" />
     <Compile Include="SharpDisplayPluginMessage.cs" />
     <Compile Include="SharpDisplayProtocolCmdStyleClasses\SharpDisplayProtocolCmdStyleBase.cs" />

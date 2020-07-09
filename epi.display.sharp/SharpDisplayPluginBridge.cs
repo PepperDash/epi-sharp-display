@@ -14,56 +14,76 @@ namespace Epi.Display.Sharp
 {
 	public static class SharpDisplayPluginBridge
 	{
-		public static void LinkToApiExt(this SharpDisplayPluginDevice device, BasicTriList trilist, uint joinStart, string joinMapKey, EiscApiAdvanced bridge)
-		{
-			SharpDisplayPluginBridgeJoinMap joinMap = new SharpDisplayPluginBridgeJoinMap(joinStart);
-            joinMap.Init();
-
-            // This adds the join map to the collection on the bridge
-            if(bridge != null)
-                bridge.AddJoinMap(device.Key, joinMap);
-
-            var customJoins = JoinMapHelper.TryGetJoinMapAdvancedForDevice(joinMapKey);
-
-            if (customJoins != null)
+        public static void LinkToApiExt(this SharpDisplayPluginDevice device, BasicTriList trilist, uint joinStart, string joinMapKey, EiscApiAdvanced bridge)
+        {
+            try
             {
-                joinMap.SetCustomJoinData(customJoins);
+                SharpDisplayPluginBridgeJoinMap joinMap = new SharpDisplayPluginBridgeJoinMap(joinStart);
+                joinMap.Init();
+
+                // This adds the join map to the collection on the bridge
+                if (bridge != null)
+                    bridge.AddJoinMap(device.Key, joinMap);
+
+                var customJoins = JoinMapHelper.TryGetJoinMapAdvancedForDevice(joinMapKey);
+
+                if (customJoins != null)
+                {
+                    joinMap.SetCustomJoinData(customJoins);
+                }
+
+                Debug.Console(1, "Linking to Trilist '{0}'", trilist.ID.ToString("X"));
+                Debug.Console(0, "Linking to Bridge Type {0}", device.GetType().Name.ToString());
+
+
+                trilist.OnlineStatusChange += new Crestron.SimplSharpPro.OnlineStatusChangeEventHandler((o, a) =>
+                {
+                    if (a.DeviceOnLine)
+                    {
+                        trilist.SetString(joinMap.DeviceName.JoinNumber, device.Name);
+                        for (uint join = 0; join <= joinMap.InputLabels.JoinSpan; join++)
+                        {
+                            trilist.SetString(joinMap.InputLabels.JoinNumber + join, device.InputLabels[(int)join]);
+                        }
+                    }
+                });
+
+                Debug.Console(2, "Linking device functions");
+
+                trilist.SetSigTrueAction(joinMap.PowerOn.JoinNumber, () => device.PowerOn());
+                trilist.SetSigTrueAction(joinMap.PowerOff.JoinNumber, () => device.PowerOff());
+                trilist.SetSigTrueAction(joinMap.PowerToggle.JoinNumber, () => device.PowerToggle());
+                trilist.SetSigTrueAction(joinMap.PollStart.JoinNumber, () => device.PollStart());
+                trilist.SetSigTrueAction(joinMap.PollStop.JoinNumber, () => device.PollStop());
+                trilist.SetUShortSigAction(joinMap.Input.JoinNumber, (value) => device.SelectInput(value));
+                trilist.SetUShortSigAction(joinMap.PollTime.JoinNumber, (value) => device.PollSetTime(value));
+
+
+
+                Debug.Console(2, "Linking Feedbacks");
+
+                if (device.PollEnabledFeedback == null)
+                    Debug.Console(2, "Poll Enalbed Feedback is null");
+                else
+                    Debug.Console(2, "Poll Enabled Feedback: {0}", device.PollEnabledFeedback.ToString());
+
+                device.PowerIsOnFeedback.LinkInputSig(trilist.BooleanInput[joinMap.PowerOn.JoinNumber]);
+                device.PowerIsOnFeedback.LinkComplementInputSig(trilist.BooleanInput[joinMap.PowerOff.JoinNumber]);
+                device.PollEnabledFeedback.LinkInputSig(trilist.BooleanInput[joinMap.PollStart.JoinNumber]);
+                device.PollEnabledFeedback.LinkComplementInputSig(trilist.BooleanInput[joinMap.PollStop.JoinNumber]);
+                device.InputActiveFeedback.LinkInputSig(trilist.UShortInput[joinMap.Input.JoinNumber]);
+
+
+
+                Debug.Console(2, "Linking Complete");
             }
 
-            Debug.Console(1, "Linking to Trilist '{0}'", trilist.ID.ToString("X"));
-            Debug.Console(0, "Linking to Bridge Type {0}", device.GetType().Name.ToString());
-
-
-            trilist.OnlineStatusChange += new Crestron.SimplSharpPro.OnlineStatusChangeEventHandler((o, a) =>
+            catch (NullReferenceException nEx)
             {
-                if (a.DeviceOnLine)
-                {
-                    trilist.SetString(joinMap.DeviceName.JoinNumber, device.Name);
-                }
-            });
+                Debug.Console(2, Debug.ErrorLogLevel.Error, "Error linking Bridge. Device is Null: {0}", nEx.ToString());
+            }
 
-            Debug.Console(2, "Linking device functions");
-
-            trilist.SetSigTrueAction(joinMap.PowerOn.JoinNumber, () => device.PowerOn());
-            trilist.SetSigTrueAction(joinMap.PowerOff.JoinNumber, () => device.PowerOff());
-            //trilist.SetSigTrueAction(joinMap.PowerToggle.JoinNumber, () => device.PowerToggle());
-            trilist.SetSigTrueAction(joinMap.PollStart.JoinNumber, () => device.PollStart());
-            trilist.SetSigTrueAction(joinMap.PollStop.JoinNumber, () => device.PollStop());
-            trilist.SetUShortSigAction(joinMap.Input.JoinNumber, (value) => device.SelectInput(value));
-            trilist.SetUShortSigAction(joinMap.PollTime.JoinNumber, (value) => device.PollSetTime(value));
-
-            Debug.Console(2, "Linking Feedbacks");
-            device.PowerIsOnFeedback.LinkInputSig(trilist.BooleanInput[joinMap.PowerOn.JoinNumber]);
-            device.PowerIsOnFeedback.LinkComplementInputSig(trilist.BooleanInput[joinMap.PowerOff.JoinNumber]);
-            device.PollIsStartedFeedback.LinkInputSig(trilist.BooleanInput[joinMap.PollStart.JoinNumber]);
-            device.PollIsStartedFeedback.LinkComplementInputSig(trilist.BooleanInput[joinMap.PollStop.JoinNumber]);
-            device.InputActiveFeedback.LinkInputSig(trilist.UShortInput[joinMap.Input.JoinNumber]);
-
-            Debug.Console(2, "Linking Complete");
-            
-         
-		}
-
+        }
 	}
 
 
@@ -139,6 +159,15 @@ namespace Epi.Display.Sharp
                 Label = "Poll Time",
                 JoinCapabilities = eJoinCapabilities.FromSIMPL,
                 JoinType = eJoinType.Analog
+            });
+
+        [JoinName("inputLabels")]
+        public JoinDataComplete InputLabels = new JoinDataComplete(new JoinData { JoinNumber = 7, JoinSpan = 10 },
+            new JoinMetadata
+            {
+                Label = "Input Labels",
+                JoinCapabilities = eJoinCapabilities.ToSIMPL,
+                JoinType = eJoinType.Serial
             });
 
 
