@@ -5,24 +5,27 @@ using PepperDash.Core;
 
 namespace Epi.Display.Sharp.SharpDisplayProtocolCmdStyleClasses
 {
-    public class SharpDisplayProtocolCmdStyle05 : SharpDisplayProtocolCmdStyleBase
+    public class SharpDisplayProtocolCmdStyle_PN_UH501 : SharpDisplayProtocolCmdStyleBase
     {
 
-        public SharpDisplayProtocolCmdStyle05(SharpDisplayPluginDevice device) : base(device)
+        public SharpDisplayProtocolCmdStyle_PN_UH501(SharpDisplayPluginDevice device) : base(device)
         {
             ParamMatchRegexPattern = @"\d+";
-            PollString = "POWR????\x0D";
+            PollString = "POWR   ?\x0D";
             Pad = '\x20';
 
             InputList = new Dictionary<ushort, SharpDisplayPluginInput>
             {
-                {1,new SharpDisplayPluginInput("HDMI1","9")},                
-                {2,new SharpDisplayPluginInput("HDMI2","10")},
-                {3,new SharpDisplayPluginInput("HDMI3","12")},
-                {4,new SharpDisplayPluginInput("HDMI4","13")},
+                {1,new SharpDisplayPluginInput("HDMI1","10")},                
+                {2,new SharpDisplayPluginInput("HDMI2","13")},
+                {3,new SharpDisplayPluginInput("DSub","2")},
+                {4,new SharpDisplayPluginInput("USB","11")},
                 {5,new SharpDisplayPluginInput("RGB","1")},
-                {6,new SharpDisplayPluginInput("Component","2")},
-                {7,new SharpDisplayPluginInput("Video","4")},
+                {6,new SharpDisplayPluginInput("TV","25")},
+                {7,new SharpDisplayPluginInput("","")},
+                {8,new SharpDisplayPluginInput("","")},
+                {9,new SharpDisplayPluginInput("","")},
+                {10,new SharpDisplayPluginInput("","")},
                 {0, new SharpDisplayPluginInput("Poll","????")}
             };
 
@@ -30,7 +33,7 @@ namespace Epi.Display.Sharp.SharpDisplayProtocolCmdStyleClasses
             PowerParams = new Dictionary<ePowerParams, string>{
                 {ePowerParams.On, "1"},
                 {ePowerParams.Off,"0"},
-                {ePowerParams.Poll,"????"},
+                {ePowerParams.Poll,"?"},
             };
 
 
@@ -44,15 +47,15 @@ namespace Epi.Display.Sharp.SharpDisplayProtocolCmdStyleClasses
             Commands = new Dictionary<eCommands, string>()
             {
                 {eCommands.Power,  "POWR"},
-                {eCommands.Input,"IAVD"},
-                {eCommands.CommandSetting, "RSPW"}
+                {eCommands.Input,"INPS"},
+                {eCommands.CommandSetting, ""}
             };
 
         }
 
         public override string FormatParameter(string parameter)
         {
-            return parameter.PadRight(Len,Pad);
+            return parameter.PadLeft(Len,Pad);
         }
     }
 }

@@ -1,12 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using Crestron.SimplSharp;
-
+﻿
 using PepperDash.Core;
-using PepperDash.Essentials.Core;
-using PepperDash.Essentials.Core.Config;
 
 namespace Epi.Display.Sharp
 {
@@ -17,7 +10,24 @@ namespace Epi.Display.Sharp
         public bool Enabled { get; set; }
         public string Name { get; set; }
         public string Protocol { get; set; }
+
+        public CustomCommand[] CustomCommands { get; set; }
+
 	}
 
+    public partial class CustomCommand
+    {
+
+        public string Key { get; set; }
+
+
+        public string Name { get; set; }
+
+
+        public string Command { get; set; }
+
+
+        public string ResponseHandler { get; set; }
+    }
 
 }

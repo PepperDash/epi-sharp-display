@@ -5,14 +5,14 @@ using PepperDash.Core;
 
 namespace Epi.Display.Sharp.SharpDisplayProtocolCmdStyleClasses
 {
-    public class SharpDisplayProtocolCmdStyle05 : SharpDisplayProtocolCmdStyleBase
+    public class SharpDisplayProtocolCmdStyle03 : SharpDisplayProtocolCmdStyleBase
     {
 
-        public SharpDisplayProtocolCmdStyle05(SharpDisplayPluginDevice device) : base(device)
+        public SharpDisplayProtocolCmdStyle03(SharpDisplayPluginDevice device) : base(device)
         {
             ParamMatchRegexPattern = @"\d+";
             PollString = "POWR????\x0D";
-            Pad = '\x20';
+            Pad = '0';
 
             InputList = new Dictionary<ushort, SharpDisplayPluginInput>
             {
@@ -52,7 +52,7 @@ namespace Epi.Display.Sharp.SharpDisplayProtocolCmdStyleClasses
 
         public override string FormatParameter(string parameter)
         {
-            return parameter.PadRight(Len,Pad);
+            return parameter.PadLeft(Len,Pad);
         }
     }
 }

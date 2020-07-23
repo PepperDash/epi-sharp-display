@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using Crestron.SimplSharp;
 using Epi.Display.Sharp.DisplayEventArgs;
 using PepperDash.Core;
@@ -27,7 +26,7 @@ namespace Epi.Display.Sharp
             PollingEnabled = false;
             PollTypeCurrent = "";
             PollTime = pollTime;
-            DisplayPollTypesEnabled = new List<string> { "power", "input" };
+            DisplayPollTypesEnabled = new List<string> { "power", "input", "commandSetting" };
 
             PollEnabledFeedback = new BoolFeedback(() => PollingEnabled);
         }
@@ -55,7 +54,7 @@ namespace Epi.Display.Sharp
             PollingEnabled = true;
             PollEnabledFeedback.FireUpdate();
 
-            PollTimer = new CTimer(PollTimerExpired, PollTime);
+            PollTimer = new CTimer(PollExecute, PollTime);
         }
 
         public void StopPoll()
@@ -66,13 +65,10 @@ namespace Epi.Display.Sharp
             PollEnabledFeedback.FireUpdate();
         }
 
-        private void PollTimerExpired(object state)
+        public void PollExecute(object state)
         {
-            Debug.Console(2,"Poll Timer Expried");
-            //Check if polling is enabled. If disabled do nothing.
-            if (!PollingEnabled)
-                return;
-            Debug.Console(2, "Polling Enabled");
+            Debug.Console(2,"Poll Execute");
+
             //Check if handler has subscriptions
             var handler = Poll;
             if (handler == null)

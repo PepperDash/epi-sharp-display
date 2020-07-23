@@ -1,12 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using Crestron.SimplSharp;
-using Epi.Display.Sharp;
-using PepperDash.Core;
+﻿using System.Collections.Generic;
 using Epi.Display.Sharp.Inputs;
-using System.Text.RegularExpressions;
+using PepperDash.Core;
 
 
 namespace Epi.Display.Sharp.SharpDisplayProtocolCmdStyleClasses
@@ -45,21 +39,6 @@ namespace Epi.Display.Sharp.SharpDisplayProtocolCmdStyleClasses
         public override string FormatParameter(string parameter)
         {
             return parameter.PadLeft(Len, Pad);
-        }
-
-        public override void FormatPowerCommand(eCommands command, ePowerParams parameter)
-        {
-            Debug.Console(2,Debug.ErrorLogLevel.Error, "Protocol Style Not Defined");
-        }
-
-        public override void FormatInputCommand(eCommands command, eInputParams parameter)
-        {
-            Debug.Console(2, Debug.ErrorLogLevel.Error, "Protocol Style Not Defined");
-        }
-        
-        public override void FormatCommandFromString(string command, string parameter)
-        {
-            Debug.Console(2, Debug.ErrorLogLevel.Error, "Protocol Style Not Defined");
         }
 
         public override void FormatCommand(eCommands command, ePowerParams parameter)

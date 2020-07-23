@@ -1,12 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using Crestron.SimplSharp;
-using Epi.Display.Sharp;
-using PepperDash.Core;
+﻿using System.Collections.Generic;
 using Epi.Display.Sharp.Inputs;
-using System.Text.RegularExpressions;
+using PepperDash.Core;
 
 
 namespace Epi.Display.Sharp.SharpDisplayProtocolCmdStyleClasses
@@ -60,73 +54,5 @@ namespace Epi.Display.Sharp.SharpDisplayProtocolCmdStyleClasses
         {
             return parameter.PadLeft(Len,Pad);
         }
-
-        public override void FormatCommandFromString(string command, string parameter)
-        {
-            var FormatedParameter = FormatParameter(parameter);
-            SharpDisplayPluginMessage Command = new SharpDisplayPluginMessage(Device, string.Format("{0}{1}", command, parameter));
-            Command.SetResponseAction(Device.SetPowerFb);
-            Device.ExecuteCommand(Command);
-
-        }
-
-        public override void FormatPowerCommand(eCommands command, ePowerParams parameter)
-        {
-
-            var FormattedParameter = FormatParameter(PowerParams[parameter]);
-
-            SharpDisplayPluginMessage Command = new SharpDisplayPluginMessage(Device, string.Format("{0}{1}", Commands[command], FormattedParameter));
-            Command.SetResponseAction(Device.SetPowerFb);
-            Device.ExecuteCommand(Command);
-        }
-
-
-        public override void FormatInputCommand(eCommands command, eInputParams parameter)
-        {
-
-            var FormattedParameter = FormatParameter(InputList[(ushort) parameter].InputCode);
-
-            if (FormattedParameter == null)
-                return;
-
-            SharpDisplayPluginMessage Command = new SharpDisplayPluginMessage(Device, string.Format("{0}{1}", Commands[command], FormattedParameter));
-            Command.SetResponseAction(Device.SetPowerFb);
-            Device.ExecuteCommand(Command);
-        }
-
-        public override void FormatCommand(eCommands command, ePowerParams parameter)
-        {
-            var FormattedParameter = FormatParameter(PowerParams[parameter]);
-
-            SharpDisplayPluginMessage Command = new SharpDisplayPluginMessage(Device, string.Format("{0}{1}", Commands[command], FormattedParameter));
-            Command.SetResponseAction(Device.SetPowerFb);
-            Device.ExecuteCommand(Command);
-        }
-
-        public override void FormatCommand(eCommands command, eInputParams parameter)
-        {
-            var Input = InputList[(ushort) parameter].InputCode;
-
-            if (Input == null)
-            {
-                Debug.Console(2, "Invalid Input Selected");
-                return;
-            }
-
-            var FormattedParameter = FormatParameter(Input);
-
-            SharpDisplayPluginMessage Command = new SharpDisplayPluginMessage(Device, string.Format("{0}{1}", Commands[command], FormattedParameter));
-            Command.SetResponseAction(Device.SetPowerFb);
-            Device.ExecuteCommand(Command);
-        }
-
-        public override void FormatCommand(eCommands command, string parameter)
-        {
-            var FormatedParameter = FormatParameter(parameter);
-            SharpDisplayPluginMessage Command = new SharpDisplayPluginMessage(Device, string.Format("{0}{1}", command, parameter));
-            Command.SetResponseAction(Device.SetPowerFb);
-            Device.ExecuteCommand(Command);
-        }
-
     }
 }

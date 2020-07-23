@@ -5,10 +5,10 @@ using PepperDash.Core;
 
 namespace Epi.Display.Sharp.SharpDisplayProtocolCmdStyleClasses
 {
-    public class SharpDisplayProtocolCmdStyle05 : SharpDisplayProtocolCmdStyleBase
+    public class SharpDisplayProtocolCmdStyle_PN_UH701 : SharpDisplayProtocolCmdStyleBase
     {
 
-        public SharpDisplayProtocolCmdStyle05(SharpDisplayPluginDevice device) : base(device)
+        public SharpDisplayProtocolCmdStyle_PN_UH701(SharpDisplayPluginDevice device) : base(device)
         {
             ParamMatchRegexPattern = @"\d+";
             PollString = "POWR????\x0D";
@@ -16,13 +16,10 @@ namespace Epi.Display.Sharp.SharpDisplayProtocolCmdStyleClasses
 
             InputList = new Dictionary<ushort, SharpDisplayPluginInput>
             {
-                {1,new SharpDisplayPluginInput("HDMI1","9")},                
-                {2,new SharpDisplayPluginInput("HDMI2","10")},
-                {3,new SharpDisplayPluginInput("HDMI3","12")},
-                {4,new SharpDisplayPluginInput("HDMI4","13")},
-                {5,new SharpDisplayPluginInput("RGB","1")},
-                {6,new SharpDisplayPluginInput("Component","2")},
-                {7,new SharpDisplayPluginInput("Video","4")},
+                {1,new SharpDisplayPluginInput("HDMI1","1")},                
+                {2,new SharpDisplayPluginInput("HDMI2","2")},
+                {3,new SharpDisplayPluginInput("USB","4")},
+                {4,new SharpDisplayPluginInput("TV","0")},
                 {0, new SharpDisplayPluginInput("Poll","????")}
             };
 

@@ -1,13 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using Crestron.SimplSharpPro.CrestronThread;
 using Crestron.SimplSharp;
-
-using PepperDash.Core;
-
 using Epi.Display.Sharp.DisplayEventArgs;
+using PepperDash.Core;
 
 
 namespace Epi.Display.Sharp.SharpPluginQueue
@@ -15,7 +9,7 @@ namespace Epi.Display.Sharp.SharpPluginQueue
     public class SharpDisplayPluginQueue
     {
         CrestronQueue<SharpDisplayPluginMessage> PluginQueue;
-        //Thread PluginThread;
+
 
         public EventHandler<SharpDisplayMessageEventArgs> MessageProcessed;
 

@@ -1,12 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using Crestron.SimplSharp;
-using PepperDash.Core;
-using Epi.Display.Sharp;
 using System.Text.RegularExpressions;
 using Epi.Display.Sharp.Inputs;
+using PepperDash.Core;
 
 
 namespace Epi.Display.Sharp.SharpDisplayProtocolCmdStyleClasses
@@ -27,6 +23,7 @@ namespace Epi.Display.Sharp.SharpDisplayProtocolCmdStyleClasses
         protected string Parameter;
 
         protected SharpDisplayPluginDevice Device;
+        protected SharpDisplayPluginConfigObject Config;
         
         public string PollString = string.Empty;
         public string Delimiter = "\x0D";
@@ -38,18 +35,14 @@ namespace Epi.Display.Sharp.SharpDisplayProtocolCmdStyleClasses
             Device = device;
         }
 
+        public SharpDisplayProtocolCmdStyleBase(SharpDisplayPluginDevice device, SharpDisplayPluginConfigObject config)
+        {
+            Device = device;
+            Config = config;        
+        }
+
         #region IHasProtocolStyle Members
-        /*
-        public abstract string FormatCommandFromString(string command, string parameter);
 
-        public abstract string FormatPowerCommand(eCommands command, ePowerParams parameter);
-
-        public abstract string FormatInputCommand(eCommands command, eInputParams parameter);
-
-        public abstract string FormatCommandSettingCommand(eCommands command, eCommMethod parameter);
-
-        public abstract string FormatParameter(string parameter);
-        */
 
         public abstract string FormatParameter(string parameter);
 
@@ -67,6 +60,9 @@ namespace Epi.Display.Sharp.SharpDisplayProtocolCmdStyleClasses
             if (response.ToUpper().Contains("ERR"))
                 return new SharpDisplayPluginResponseError();
 
+            if (response.ToUpper().Contains("WAIT"))
+                return new SharpDisplayPluginResponseWait();
+
             Match Param = ParamRegex.Match(response);
             Debug.Console(2, "Param match: {0}", Param.Value);
             if (!Param.Success)
@@ -78,20 +74,69 @@ namespace Epi.Display.Sharp.SharpDisplayProtocolCmdStyleClasses
             return new SharpDisplayPluginResponse(Param.ToString());
         }
 
+        public virtual void FormatCommand(eCommands command, ePowerParams parameter)
+        {
+            var Cmd = Commands[command];
 
-        public abstract void FormatCommandFromString(string command, string parameter);
+            if (Cmd == "")
+                return;
+
+            var FormattedParameter = FormatParameter(PowerParams[parameter]);
+
+            SharpDisplayPluginMessage Command = new SharpDisplayPluginMessage(Device, string.Format("{0}{1}", Cmd, FormattedParameter));
+            Command.SetResponseAction(Device.SetPowerFb);
+            Device.ExecuteCommand(Command);
+        }
 
 
-        public abstract void FormatPowerCommand(eCommands command, ePowerParams parameter);
+        public virtual void FormatCommand(eCommands command, eInputParams parameter)
+        {
+            var Cmd = Commands[command];
 
+            if (Cmd == "")
+                return;
 
-        public abstract void FormatInputCommand(eCommands command, eInputParams parameter);
+            var Input = InputList[(ushort)parameter].InputCode;
 
-        public abstract void FormatCommand(eCommands command, ePowerParams parameter);
+            if (Input == null)
+            {
+                Debug.Console(2, "Invalid Input Selected");
+                return;
+            }
 
-        public abstract void FormatCommand(eCommands command, eInputParams parameter);
+            var FormattedParameter = FormatParameter(Input);
 
-        public abstract void FormatCommand(eCommands command, string parameter);
+            SharpDisplayPluginMessage Command = new SharpDisplayPluginMessage(Device, string.Format("{0}{1}", Cmd, FormattedParameter));
+            Command.SetResponseAction(Device.SetInputFb);
+            Device.ExecuteCommand(Command);
+        }
+
+        public virtual void FormatCommand(eCommands command, int parameter)
+        {
+            var Cmd = Commands[command];
+
+            if (Cmd == "")
+                return;
+
+            var FormatedParameter = FormatParameter(parameter.ToString());
+            SharpDisplayPluginMessage Command = new SharpDisplayPluginMessage(Device, string.Format("{0}{1}", Cmd, parameter));
+            Command.SetResponseAction(Device.SetPowerFb);
+            Device.ExecuteCommand(Command);
+        }
+
+        public virtual void FormatCommand(eCommands command, string parameter)
+        {
+            var Cmd = Commands[command];
+
+            if (Cmd == "")
+                return;
+
+            var FormatedParameter = FormatParameter(parameter);
+            SharpDisplayPluginMessage Command = new SharpDisplayPluginMessage(Device, string.Format("{0}{1}", Cmd, parameter));
+            Command.SetResponseAction(Device.SetPowerFb);
+            Device.ExecuteCommand(Command);
+        }
+
 
         public List<string> GetInputs()
         {
@@ -117,6 +162,10 @@ namespace Epi.Display.Sharp.SharpDisplayProtocolCmdStyleClasses
     }
 
     public class SharpDisplayPluginResponseError
+    {
+    }
+
+    public class SharpDisplayPluginResponseWait
     {
     }
 }

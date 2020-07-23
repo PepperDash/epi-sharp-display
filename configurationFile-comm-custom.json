@@ -52,7 +52,13 @@
                     },
                     "Enabled": true,
                     "Name": "Main Display",
-                    "Protocol": 1
+                    "Protocol": 0,
+                    "CustomCommands": [
+                        {"key":"PowerOn", "name": "Power On", "command":"POWER-1\\x0D", "responseHandler":"SetPowerFb"},
+                        {"key":"PowerOn", "name": "Power On", "command":"POWER-0\\x0D", "responseHandler":"SetPowerFb"},
+                        {"key":"Input1" , "name": "HDMI1", "command":"INPUT-1\\x0D", "responseHandler":"SetInputFb"},
+                        {"key":"Input2" , "name": "HDMI2", "command":"INPUT-2\\x0D", "responseHandler":"SetInputFb"}
+                    ]
                 }
             },
             {

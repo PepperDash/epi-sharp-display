@@ -5,13 +5,13 @@ using PepperDash.Core;
 
 namespace Epi.Display.Sharp.SharpDisplayProtocolCmdStyleClasses
 {
-    public class SharpDisplayProtocolCmdStyle05 : SharpDisplayProtocolCmdStyleBase
+    public class SharpDisplayProtocolCmdStyle02 : SharpDisplayProtocolCmdStyleBase
     {
 
-        public SharpDisplayProtocolCmdStyle05(SharpDisplayPluginDevice device) : base(device)
+        public SharpDisplayProtocolCmdStyle02(SharpDisplayPluginDevice device) : base(device)
         {
             ParamMatchRegexPattern = @"\d+";
-            PollString = "POWR????\x0D";
+            PollString = "POWR   ?\x0D";
             Pad = '\x20';
 
             InputList = new Dictionary<ushort, SharpDisplayPluginInput>
@@ -23,14 +23,14 @@ namespace Epi.Display.Sharp.SharpDisplayProtocolCmdStyleClasses
                 {5,new SharpDisplayPluginInput("RGB","1")},
                 {6,new SharpDisplayPluginInput("Component","2")},
                 {7,new SharpDisplayPluginInput("Video","4")},
-                {0, new SharpDisplayPluginInput("Poll","????")}
+                {0, new SharpDisplayPluginInput("Poll","?")}
             };
 
 
             PowerParams = new Dictionary<ePowerParams, string>{
                 {ePowerParams.On, "1"},
                 {ePowerParams.Off,"0"},
-                {ePowerParams.Poll,"????"},
+                {ePowerParams.Poll,"?"},
             };
 
 

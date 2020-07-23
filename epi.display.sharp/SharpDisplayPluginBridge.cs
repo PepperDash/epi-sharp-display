@@ -1,12 +1,8 @@
 ﻿using System;
-using System.Linq;
-using System.Text.RegularExpressions;
 using Crestron.SimplSharpPro.DeviceSupport;
 using PepperDash.Core;
-using PepperDash.Essentials.Bridges;
 using PepperDash.Essentials.Core;
 
-using Epi.Display.Sharp.SharpDisplayProtocolCmdStyleClasses;
 using PepperDash.Essentials.Core.Bridges;
 
 
@@ -14,6 +10,8 @@ namespace Epi.Display.Sharp
 {
 	public static class SharpDisplayPluginBridge
 	{
+        
+
         public static void LinkToApiExt(this SharpDisplayPluginDevice device, BasicTriList trilist, uint joinStart, string joinMapKey, EiscApiAdvanced bridge)
         {
             try
@@ -36,18 +34,6 @@ namespace Epi.Display.Sharp
                 Debug.Console(0, "Linking to Bridge Type {0}", device.GetType().Name.ToString());
 
 
-                trilist.OnlineStatusChange += new Crestron.SimplSharpPro.OnlineStatusChangeEventHandler((o, a) =>
-                {
-                    if (a.DeviceOnLine)
-                    {
-                        trilist.SetString(joinMap.DeviceName.JoinNumber, device.Name);
-                        for (uint join = 0; join <= joinMap.InputLabels.JoinSpan; join++)
-                        {
-                            trilist.SetString(joinMap.InputLabels.JoinNumber + join, device.InputLabels[(int)join]);
-                        }
-                    }
-                });
-
                 Debug.Console(2, "Linking device functions");
 
                 trilist.SetSigTrueAction(joinMap.PowerOn.JoinNumber, () => device.PowerOn());
@@ -55,8 +41,10 @@ namespace Epi.Display.Sharp
                 trilist.SetSigTrueAction(joinMap.PowerToggle.JoinNumber, () => device.PowerToggle());
                 trilist.SetSigTrueAction(joinMap.PollStart.JoinNumber, () => device.PollStart());
                 trilist.SetSigTrueAction(joinMap.PollStop.JoinNumber, () => device.PollStop());
+                trilist.SetSigTrueAction(joinMap.PollNext.JoinNumber, () => device.PollNext());
                 trilist.SetUShortSigAction(joinMap.Input.JoinNumber, (value) => device.SelectInput(value));
                 trilist.SetUShortSigAction(joinMap.PollTime.JoinNumber, (value) => device.PollSetTime(value));
+                trilist.SetStringSigAction(joinMap.Protocol.JoinNumber, (s) => device.SetProtocol(s));
 
 
 
@@ -74,6 +62,9 @@ namespace Epi.Display.Sharp
                 device.InputActiveFeedback.LinkInputSig(trilist.UShortInput[joinMap.Input.JoinNumber]);
 
 
+                device.CommunicationMonitor.IsOnlineFeedback.LinkInputSig(trilist.BooleanInput[joinMap.OnlineFb.JoinNumber]);
+
+
 
                 Debug.Console(2, "Linking Complete");
             }
@@ -84,7 +75,19 @@ namespace Epi.Display.Sharp
             }
 
         }
-	}
+
+        public static void UpdateBridge(this SharpDisplayPluginDevice device, BasicTriList trilist, uint joinStart, string joinMapKey, EiscApiAdvanced bridge)
+        {
+            SharpDisplayPluginBridgeJoinMap joinMap = new SharpDisplayPluginBridgeJoinMap(joinStart);
+            joinMap.Init();
+
+            trilist.SetString(joinMap.DeviceName.JoinNumber, device.Name);
+            for (uint join = 0; join <= joinMap.InputLabels.JoinSpan; join++)
+            {
+                trilist.SetString(joinMap.InputLabels.JoinNumber + join, device.InputLabels[(int)join]);
+            }
+        }
+    }
 
 
 	public class SharpDisplayPluginBridgeJoinMap : JoinMapBaseAdvanced
@@ -143,6 +146,24 @@ namespace Epi.Display.Sharp
                 JoinType = eJoinType.Digital
             });
 
+        [JoinName("pollNext")]
+        public JoinDataComplete PollNext = new JoinDataComplete(new JoinData { JoinNumber = 6, JoinSpan = 1 },
+            new JoinMetadata
+            {
+                Label = "Poll Next",
+                JoinCapabilities = eJoinCapabilities.ToFromSIMPL,
+                JoinType = eJoinType.Digital
+            });
+
+        [JoinName("OnlineFb")]
+        public JoinDataComplete OnlineFb = new JoinDataComplete(new JoinData { JoinNumber = 7, JoinSpan = 1 },
+            new JoinMetadata
+            {
+                Label = "OnlineFb",
+                JoinCapabilities = eJoinCapabilities.ToSIMPL,
+                JoinType = eJoinType.Digital
+            });
+
         [JoinName("input")]
         public JoinDataComplete Input = new JoinDataComplete(new JoinData { JoinNumber = 1, JoinSpan = 1 },
             new JoinMetadata
@@ -159,6 +180,15 @@ namespace Epi.Display.Sharp
                 Label = "Poll Time",
                 JoinCapabilities = eJoinCapabilities.FromSIMPL,
                 JoinType = eJoinType.Analog
+            });
+
+        [JoinName("protocol")]
+        public JoinDataComplete Protocol = new JoinDataComplete(new JoinData { JoinNumber = 1, JoinSpan = 1 },
+            new JoinMetadata
+            {
+                Label = "Protocol",
+                JoinCapabilities = eJoinCapabilities.FromSIMPL,
+                JoinType = eJoinType.Serial
             });
 
         [JoinName("inputLabels")]

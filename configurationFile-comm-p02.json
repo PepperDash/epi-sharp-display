@@ -52,7 +52,7 @@
                     },
                     "Enabled": true,
                     "Name": "Main Display",
-                    "Protocol": 1
+                    "Protocol": "ProtocolStyle03"
                 }
             },
             {

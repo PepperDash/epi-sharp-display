@@ -52,7 +52,13 @@
                     },
                     "Enabled": true,
                     "Name": "Main Display",
-                    "Protocol": 1
+                    "Protocol": "ProtocolStyleCustom",
+                    "CustomCommands": [
+                        {"key":"PowerOn", "name": "Power On", "commnad":"POWR   1\\x0D"},
+                        {"key":"PowerOff", "name": "Power Off", "commnad":"POWR   0\\x0D"},
+                        {"key":"Input1" , "name": "HDMI1", "commnad":"IAVD   9\\x0D"},
+                        {"key":"Input2", "name": "HDMI2", "commnad":"IAVD  10\\x0D"}
+                    ]
                 }
             },
             {
