@@ -49,14 +49,4 @@ namespace Epi.Display.Sharp
  	         return ReturnString;
         }
     }
-
-    public class SharpDisplayPluginResponse
-    {
-        public string ResponseString{get; private set;} 
-
-        public SharpDisplayPluginResponse(string response)
-        {
-            ResponseString = response;
-        }
-    }
 }

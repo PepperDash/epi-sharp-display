@@ -8,14 +8,14 @@ namespace Epi.Display.Sharp.SharpPluginQueue
 {
     public class SharpDisplayPluginQueue
     {
-        CrestronQueue<SharpDisplayPluginMessage> PluginQueue;
+        readonly CrestronQueue<SharpDisplayCommand> PluginQueue;
 
 
         public EventHandler<SharpDisplayMessageEventArgs> MessageProcessed;
 
         public SharpDisplayPluginQueue()
         {
-            PluginQueue = new CrestronQueue<SharpDisplayPluginMessage>(25);
+            PluginQueue = new CrestronQueue<SharpDisplayCommand>(25);
             //PluginThread = new Thread(o => ProcessQueue(), null, Thread.eThreadStartOptions.Running);
         }
 
@@ -23,28 +23,27 @@ namespace Epi.Display.Sharp.SharpPluginQueue
 
         public void RaiseEvent_ProcessMessage(string message)
         {
-            var Handler = MessageProcessed;
-            if (Handler != null)
+            var handler = MessageProcessed;
+            if (handler != null)
             {
-                Handler(this, new SharpDisplayMessageEventArgs(message));
+                handler(this, new SharpDisplayMessageEventArgs(message));
             }
         }
 
-        public SharpDisplayPluginMessage GetNextCommand()
+        public SharpDisplayCommand GetNextCommand()
         {
-            if (PluginQueue.IsEmpty)
-                return null;
-
-            return PluginQueue.Peek();
+            return PluginQueue.IsEmpty ? null : PluginQueue.Peek();
         }
 
 
-        public void EnqueueMessage(SharpDisplayPluginMessage response)
+        public void EnqueueMessage(SharpDisplayCommand response)
         {
             PluginQueue.Enqueue(response);
         }
 
-        public SharpDisplayPluginMessage DequeueMessage()
+        
+
+        public SharpDisplayCommand DequeueMessage()
         {
             return PluginQueue.TryToDequeue();
             

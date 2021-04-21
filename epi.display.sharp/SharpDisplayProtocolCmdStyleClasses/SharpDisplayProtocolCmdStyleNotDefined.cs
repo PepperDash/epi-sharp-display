@@ -8,31 +8,21 @@ namespace Epi.Display.Sharp.SharpDisplayProtocolCmdStyleClasses
     public class SharpDisplayProtocolCmdStyleNotDefined : SharpDisplayProtocolCmdStyleBase
     {
 
-        public SharpDisplayProtocolCmdStyleNotDefined(SharpDisplayPluginDevice device) : base(device)
+        public SharpDisplayProtocolCmdStyleNotDefined(SharpDisplayPluginDevice device)
+            : base(device)
         {
             ParamMatchRegexPattern = @"\d+";
             Pad = '\x20';
 
-            InputList = new Dictionary<ushort, SharpDisplayPluginInput>
-            {
+            InputList = new Dictionary<ushort, SharpDisplayPluginInput>();
 
-            };
+            PowerParams = new Dictionary<EPowerParams, string>();
+            CommandSettingParams = new Dictionary<ECommMethod, string>();
+            Commands = new Dictionary<ECommands, string>();
+        }
 
-
-            PowerParams = new Dictionary<ePowerParams, string>{
-
-            };
-
-
-            CommandSettingParams = new Dictionary<eCommMethod, string>{
-
-            };
-
-
-            Commands = new Dictionary<eCommands, string>()
-            {
-
-            };
+        protected override void InitLocalPorts()
+        {
 
         }
 
@@ -41,20 +31,16 @@ namespace Epi.Display.Sharp.SharpDisplayProtocolCmdStyleClasses
             return parameter.PadLeft(Len, Pad);
         }
 
-        public override void FormatCommand(eCommands command, ePowerParams parameter)
+        public override void FormatCommand(ECommands command, EPowerParams parameter)
         {
             Debug.Console(2, Debug.ErrorLogLevel.Error, "Protocol Style Not Defined");
         }
 
-        public override void FormatCommand(eCommands command, eInputParams parameter)
+        public override void FormatCommand(ECommands command, EInputParams parameter)
         {
             Debug.Console(2, Debug.ErrorLogLevel.Error, "Protocol Style Not Defined");
         }
 
-        public override void FormatCommand(eCommands command, string parameter)
-        {
-            Debug.Console(2, Debug.ErrorLogLevel.Error, "Protocol Style Not Defined");
-        }
 
 
     }

@@ -31,7 +31,7 @@ namespace Epi.Display.Sharp
             PollEnabledFeedback = new BoolFeedback(() => PollingEnabled);
         }
 
-        public SharpDisplayPluginPoll(long pollTime, string[] enable)
+        public SharpDisplayPluginPoll(long pollTime, IEnumerable<string> enable)
         {
             PollingEnabled = false;
             PollTypeCurrent = "";
@@ -89,23 +89,23 @@ namespace Epi.Display.Sharp
             {
                 //Check index of current type polled for. 
 
-                int PollTypeCurrentIndex = DisplayPollTypesEnabled.IndexOf(PollTypeCurrent);
-                Debug.Console(2, "Get Poll index = {0}", PollTypeCurrentIndex);
+                var pollTypeCurrentIndex = DisplayPollTypesEnabled.IndexOf(PollTypeCurrent);
+                Debug.Console(2, "Get Poll index = {0}", pollTypeCurrentIndex);
 
                 //Reached end of polling... set to beginning
-                if (PollTypeCurrentIndex == DisplayPollTypesEnabled.Count - 1)
+                if (pollTypeCurrentIndex == DisplayPollTypesEnabled.Count - 1)
                 {
                     Debug.Console(2, "Poll index equals count");
-                    PollTypeCurrentIndex = 0;
+                    pollTypeCurrentIndex = 0;
                 }
                 else
                 {
                     // advance to next
-                    PollTypeCurrentIndex = DisplayPollTypesEnabled.IndexOf(PollTypeCurrent) + 1;
-                    Debug.Console(2, "Poll Advance to {0}", PollTypeCurrentIndex);
+                    pollTypeCurrentIndex = DisplayPollTypesEnabled.IndexOf(PollTypeCurrent) + 1;
+                    Debug.Console(2, "Poll Advance to {0}", pollTypeCurrentIndex);
                 }
                 //Get type to poll for
-                PollTypeCurrent = DisplayPollTypesEnabled.ElementAt<string>(PollTypeCurrentIndex);
+                PollTypeCurrent = DisplayPollTypesEnabled.ElementAt(pollTypeCurrentIndex);
                 Debug.Console(2,"Polling: Polltype: {0}", PollTypeCurrent);
             }
 

@@ -15,7 +15,7 @@ namespace Epi.Display.Sharp
 
 	}
 
-    public partial class CustomCommand
+    public class CustomCommand
     {
 
         public string Key { get; set; }

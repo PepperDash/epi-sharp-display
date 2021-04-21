@@ -1,19 +1,21 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text.RegularExpressions;
 using Epi.Display.Sharp.Inputs;
 using PepperDash.Core;
+using PepperDash.Essentials.Core;
 
 
 namespace Epi.Display.Sharp.SharpDisplayProtocolCmdStyleClasses
 {
-    public abstract class SharpDisplayProtocolCmdStyleBase
+    public abstract class SharpDisplayProtocolCmdStyleBase : IRoutingInputs
     {
 
 
-        public Dictionary<eCommands, string> Commands;
-        public Dictionary<ePowerParams, string> PowerParams;
-        public Dictionary<eCommMethod, string> CommandSettingParams;
+        public Dictionary<ECommands, string> Commands;
+        public Dictionary<EPowerParams, string> PowerParams;
+        public Dictionary<ECommMethod, string> CommandSettingParams;
 
         public Dictionary<ushort, SharpDisplayPluginInput> InputList;
 
@@ -22,7 +24,9 @@ namespace Epi.Display.Sharp.SharpDisplayProtocolCmdStyleClasses
         protected string Command;
         protected string Parameter;
 
-        protected SharpDisplayPluginDevice Device;
+        public string Key { get; private set; }
+
+        protected readonly SharpDisplayPluginDevice DisplayDevice;
         protected SharpDisplayPluginConfigObject Config;
         
         public string PollString = string.Empty;
@@ -30,16 +34,29 @@ namespace Epi.Display.Sharp.SharpDisplayProtocolCmdStyleClasses
         protected char Pad;
         protected int Len = 4;
 
-        public SharpDisplayProtocolCmdStyleBase(SharpDisplayPluginDevice device)
+        public RoutingPortCollection<RoutingInputPort> InputPorts { get; private set; }
+
+        protected SharpDisplayProtocolCmdStyleBase(SharpDisplayPluginDevice device)
         {
-            Device = device;
+            DisplayDevice = device;
+            InputPorts = DisplayDevice.InputPorts;
+
         }
 
-        public SharpDisplayProtocolCmdStyleBase(SharpDisplayPluginDevice device, SharpDisplayPluginConfigObject config)
+        protected SharpDisplayProtocolCmdStyleBase(SharpDisplayPluginDevice device, SharpDisplayPluginConfigObject config) : this(device)
         {
-            Device = device;
-            Config = config;        
+            Config = config;
         }
+
+        protected void AddRoutingInputPort(RoutingInputPort port, SharpDisplayCommand command)
+        {
+            port.FeedbackMatchObject = command;
+            InputPorts.Add(port);
+        }
+
+        protected abstract void InitLocalPorts();
+
+
 
         #region IHasProtocolStyle Members
 
@@ -50,7 +67,7 @@ namespace Epi.Display.Sharp.SharpDisplayProtocolCmdStyleClasses
 
         public Object HandleResponse(string response)
         {
-            Regex ParamRegex = new Regex(ParamMatchRegexPattern);
+            var paramRegex = new Regex(ParamMatchRegexPattern);
 
             Debug.Console(2, "Handling Response: {0}", response);
 
@@ -63,87 +80,72 @@ namespace Epi.Display.Sharp.SharpDisplayProtocolCmdStyleClasses
             if (response.ToUpper().Contains("WAIT"))
                 return new SharpDisplayPluginResponseWait();
 
-            Match Param = ParamRegex.Match(response);
-            Debug.Console(2, "Param match: {0}", Param.Value);
-            if (!Param.Success)
+            var param = paramRegex.Match(response);
+            Debug.Console(2, "Param match: {0}", param.Value);
+            if (param.Success) return new SharpDisplayPluginResponse(param.ToString());
+            Debug.Console(2, "Param !success");
+            return new SharpDisplayPluginResponseError();
+        }
+
+        public virtual void FormatCommand(ECommands command, EPowerParams parameter)
+        {
+            var cmd = Commands[command];
+
+            if (cmd == "")
             {
-                Debug.Console(2, "Param !success");
-                return new SharpDisplayPluginResponseError();
+                Debug.Console(1, "Command Not Supported");
+                return;
             }
 
-            return new SharpDisplayPluginResponse(Param.ToString());
-        }
-
-        public virtual void FormatCommand(eCommands command, ePowerParams parameter)
-        {
-            var Cmd = Commands[command];
-
-            if (Cmd == "")
-                return;
-
-            var FormattedParameter = FormatParameter(PowerParams[parameter]);
-
-            SharpDisplayPluginMessage Command = new SharpDisplayPluginMessage(Device, string.Format("{0}{1}", Cmd, FormattedParameter));
-            Command.SetResponseAction(Device.SetPowerFb);
-            Device.ExecuteCommand(Command);
+            var displayCommand = new SharpDisplayCommand(command, parameter);
+            displayCommand.SetResponseAction(DisplayDevice.SetPowerFb);
+            DisplayDevice.ExecuteCommand(displayCommand);
         }
 
 
-        public virtual void FormatCommand(eCommands command, eInputParams parameter)
+        public virtual void FormatCommand(ECommands command, EInputParams parameter)
         {
-            var Cmd = Commands[command];
+            var cmd = Commands[command];
 
-            if (Cmd == "")
+            if (cmd == "")
                 return;
 
-            var Input = InputList[(ushort)parameter].InputCode;
+            var input = InputList[(ushort)parameter].InputCode;
 
-            if (Input == null)
+            if (input == null)
             {
                 Debug.Console(2, "Invalid Input Selected");
                 return;
             }
 
-            var FormattedParameter = FormatParameter(Input);
-
-            SharpDisplayPluginMessage Command = new SharpDisplayPluginMessage(Device, string.Format("{0}{1}", Cmd, FormattedParameter));
-            Command.SetResponseAction(Device.SetInputFb);
-            Device.ExecuteCommand(Command);
+            var displayCommand = new SharpDisplayCommand(command, parameter);
+            displayCommand.SetResponseAction(DisplayDevice.SetInputFb);
+            DisplayDevice.ExecuteCommand(displayCommand);
         }
 
-        public virtual void FormatCommand(eCommands command, int parameter)
+        public virtual void FormatCommand(SharpDisplayCommand command)
         {
-            var Cmd = Commands[command];
+            var cmd = Commands[command.GetCommand()];
 
-            if (Cmd == "")
+            if (cmd == "")
                 return;
 
-            var FormatedParameter = FormatParameter(parameter.ToString());
-            SharpDisplayPluginMessage Command = new SharpDisplayPluginMessage(Device, string.Format("{0}{1}", Cmd, parameter));
-            Command.SetResponseAction(Device.SetPowerFb);
-            Device.ExecuteCommand(Command);
-        }
+            var input = InputList[(ushort) command.GetInput()].InputCode;
 
-        public virtual void FormatCommand(eCommands command, string parameter)
-        {
-            var Cmd = Commands[command];
-
-            if (Cmd == "")
+            if (input == null)
+            {
+                Debug.Console(2, "Invalid Input Selected");
                 return;
+            }
 
-            var FormatedParameter = FormatParameter(parameter);
-            SharpDisplayPluginMessage Command = new SharpDisplayPluginMessage(Device, string.Format("{0}{1}", Cmd, parameter));
-            Command.SetResponseAction(Device.SetPowerFb);
-            Device.ExecuteCommand(Command);
+            command.SetResponseAction(DisplayDevice.SetInputFb);
+            DisplayDevice.ExecuteCommand(command);
         }
-
 
         public List<string> GetInputs()
         {
-            List<string> inputList = new List<string>(InputList.Count);
-            foreach (var input in InputList)
-                if(input.Key > 0)
-                    inputList.Add(input.Value.Name);
+            var inputList = new List<string>(InputList.Count);
+            inputList.AddRange(from input in InputList where input.Key > 0 select input.Value.Name);
 
             return inputList;
               
@@ -151,21 +153,10 @@ namespace Epi.Display.Sharp.SharpDisplayProtocolCmdStyleClasses
 
         public override string ToString()
         {
-            string type = this.GetType().Name.ToString();
+            var type = GetType().Name;
             return "Device Type: " + type;
         }
-    }
 
-    public class SharpDisplayPluginResponseOk
-    {
-
-    }
-
-    public class SharpDisplayPluginResponseError
-    {
-    }
-
-    public class SharpDisplayPluginResponseWait
-    {
+        
     }
 }

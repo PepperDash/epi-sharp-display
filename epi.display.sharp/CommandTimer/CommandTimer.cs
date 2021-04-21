@@ -1,7 +1,7 @@
 ﻿using System;
 using Crestron.SimplSharp;
 
-namespace Epi.SharpCommandTimer
+namespace Epi.Display.Sharp.CommandTimer
 {
     public class SharpCommandTimer
     {
@@ -53,11 +53,11 @@ namespace Epi.SharpCommandTimer
         {
 
             CountDownTime = timeInSeconds;  // set count down time.
-            if (!(CommandTimer == null))      // Check if timer is null - not defined first time called 
+            if (CommandTimer != null)      // Check if timer is null - not defined first time called 
             {
                 if (CommandTimer.Disposed)    // if timer has been disposed because it was stopped need to new
                 {
-                    CommandTimer = new CTimer(this.QueueTimerCallBack, null, 1000, 1000);
+                    CommandTimer = new CTimer(QueueTimerCallBack, null, 1000, 1000);
                     
                 }
                 else
@@ -67,7 +67,7 @@ namespace Epi.SharpCommandTimer
             }
             else
             {
-                CommandTimer = new CTimer(this.QueueTimerCallBack, null, 1000, 1000);               
+                CommandTimer = new CTimer(QueueTimerCallBack, null, 1000, 1000);               
             }
 
             Running = true;
@@ -115,14 +115,15 @@ namespace Epi.SharpCommandTimer
                 CountDownTime--;
             RaiseEvent_TimerUpdate();
             //CrestronConsole.PrintLine("Time Remaining: {0}:{1}", (countDownTime / 60).ToString("D2"), (countDownTime % 60).ToString("D2"));
-            if (CountDownTime == 60)
+            switch (CountDownTime)
             {
-                RaiseEvent_TimerOneMinute();
-            }
-            else if (CountDownTime == 0)
-            {
-                this.StopTimer();
-                RaiseEvent_TimerCompleted();
+                case 60:
+                    RaiseEvent_TimerOneMinute();
+                    break;
+                case 0:
+                    StopTimer();
+                    RaiseEvent_TimerCompleted();
+                    break;
             }
         }
     }

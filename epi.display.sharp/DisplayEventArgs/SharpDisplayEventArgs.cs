@@ -1,8 +1,6 @@
-﻿using System;
-
-namespace Epi.Display.Sharp.DisplayEventArgs
+﻿namespace Epi.Display.Sharp.DisplayEventArgs
 {
-    public class SharpDisplayPollEventArgs : EventArgs
+    public class SharpDisplayPollEventArgs : System.EventArgs
     {
         public string CurrentEvent { get; set; }
 
@@ -12,7 +10,7 @@ namespace Epi.Display.Sharp.DisplayEventArgs
         }
     }
 
-    public class SharpDisplayMessageEventArgs : EventArgs
+    public class SharpDisplayMessageEventArgs : System.EventArgs
     {
         public string Response { get; set; }
 

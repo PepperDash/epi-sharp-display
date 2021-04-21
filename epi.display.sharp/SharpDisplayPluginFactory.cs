@@ -13,7 +13,7 @@ namespace Epi.Display.Sharp
             MinimumEssentialsFrameworkVersion = "1.4.33";
 
             // In the constructor we initialize the list with the typenames that will build an instance of this device
-            TypeNames = new List<string>() { "sharpDisplay", "SharpDisplay", "Sharp" };
+            TypeNames = new List<string> { "sharpDisplay", "SharpDisplay", "Sharp" };
         }
 
         // Builds and returns an instance of EssentialsPluginDeviceTemplate
@@ -21,13 +21,9 @@ namespace Epi.Display.Sharp
         {
             Debug.Console(1, "Factory Attempting to create new device from type: {0}", dc.Type);
             var comms = CommFactory.CreateCommForDevice(dc);
-            if (comms != null)
-            {
-                var propertiesConfig = JsonConvert.DeserializeObject<SharpDisplayPluginConfigObject>(dc.Properties.ToString());
-                return new SharpDisplayPluginDevice(dc.Key, dc.Name, propertiesConfig, comms);
-
-            }
-            return null;
+            if (comms == null) return null;
+            var propertiesConfig = JsonConvert.DeserializeObject<SharpDisplayPluginConfigObject>(dc.Properties.ToString());
+            return new SharpDisplayPluginDevice(dc.Key, dc.Name, propertiesConfig, comms);
         }
     }
 }
