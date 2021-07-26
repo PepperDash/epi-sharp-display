@@ -5,7 +5,7 @@ namespace PepperDash.Essentials.Sharp
 {
     public static class SharpDisplayPluginProtocolCmdStyleFactory
     {
-        internal static SharpDisplayProtocolCmdStyleBase BuildSharpDislplay(SharpDisplayPluginDevice display, string displayConfig)
+        internal static SharpDisplayProtocolCmdStyleBase BuildSharpDisplay(SharpDisplayPluginDevice display, string displayConfig)
         {
             // Get config value for protocol style and return protocol
 
