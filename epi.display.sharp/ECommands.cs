@@ -1,4 +1,4 @@
-namespace Epi.Display.Sharp
+namespace PepperDash.Essentials.Sharp
 {
     public enum ECommands
     {

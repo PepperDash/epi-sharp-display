@@ -1,4 +1,4 @@
-﻿namespace Epi.Display.Sharp.SharpDisplayProtocolCmdStyleClasses
+﻿namespace PepperDash.Essentials.Sharp.SharpDisplayProtocolCmdStyleClasses
 {
     public class SharpDisplayPluginResponseError
     {

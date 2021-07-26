@@ -1,7 +1,7 @@
 ﻿using System;
 using PepperDash.Core;
 
-namespace Epi.Display.Sharp
+namespace PepperDash.Essentials.Sharp
 {
     public class SharpDisplayCommand
     {

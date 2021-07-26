@@ -1,7 +1,7 @@
-﻿using Epi.Display.Sharp.SharpDisplayProtocolCmdStyleClasses;
-using PepperDash.Core;
+﻿using PepperDash.Core;
+using PepperDash.Essentials.Sharp.SharpDisplayProtocolCmdStyleClasses;
 
-namespace Epi.Display.Sharp
+namespace PepperDash.Essentials.Sharp
 {
     public static class SharpDisplayPluginProtocolCmdStyleFactory
     {

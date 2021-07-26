@@ -1,21 +1,21 @@
 ﻿using System;
 using Crestron.SimplSharp;
-using Epi.Display.Sharp.DisplayEventArgs;
 using PepperDash.Core;
+using PepperDash.Essentials.Sharp.DisplayEventArgs;
 
 
-namespace Epi.Display.Sharp.SharpPluginQueue
+namespace PepperDash.Essentials.Sharp.SharpPluginQueue
 {
     public class SharpDisplayPluginQueue
     {
-        readonly CrestronQueue<SharpDisplayCommand> PluginQueue;
+        readonly CrestronQueue<SharpDisplayCommand> _pluginQueue;
 
 
         public EventHandler<SharpDisplayMessageEventArgs> MessageProcessed;
 
         public SharpDisplayPluginQueue()
         {
-            PluginQueue = new CrestronQueue<SharpDisplayCommand>(25);
+            _pluginQueue = new CrestronQueue<SharpDisplayCommand>(25);
             //PluginThread = new Thread(o => ProcessQueue(), null, Thread.eThreadStartOptions.Running);
         }
 
@@ -32,26 +32,26 @@ namespace Epi.Display.Sharp.SharpPluginQueue
 
         public SharpDisplayCommand GetNextCommand()
         {
-            return PluginQueue.IsEmpty ? null : PluginQueue.Peek();
+            return _pluginQueue.IsEmpty ? null : _pluginQueue.Peek();
         }
 
 
         public void EnqueueMessage(SharpDisplayCommand response)
         {
-            PluginQueue.Enqueue(response);
+            _pluginQueue.Enqueue(response);
         }
 
         
 
         public SharpDisplayCommand DequeueMessage()
         {
-            return PluginQueue.TryToDequeue();
+            return _pluginQueue.TryToDequeue();
             
         }
 
         public void PrintQueue()
         {
-            foreach (var cmd in PluginQueue)
+            foreach (var cmd in _pluginQueue)
             {
                 Debug.Console(2, "In Queue: {0}", cmd.Command);
             }
@@ -59,7 +59,7 @@ namespace Epi.Display.Sharp.SharpPluginQueue
 
         public void ClearQueue()
         {
-            PluginQueue.Clear();
+            _pluginQueue.Clear();
         }
     }
 }
