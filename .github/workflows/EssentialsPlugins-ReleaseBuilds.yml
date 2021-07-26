@@ -5,7 +5,7 @@ on:
     types:
       - created
     branches:
-      - $default-branch
+      - main
 
 env:
   # Do not edit this, we're just creating it here
@@ -13,7 +13,7 @@ env:
   # Defaults to debug for build type
   BUILD_TYPE: Release
   # Defaults to master as the release branch.  Change as necessary
-  RELEASE_BRANCH: $default-branch
+  RELEASE_BRANCH: main
 jobs:
   Build_Project:
     runs-on: windows-latest
@@ -77,7 +77,7 @@ jobs:
               Write-Output " ";
               Write-Output "Unable to apply version to AssemblyInfo.cs files";
           }
-      - name: add PepperDash Eng Feed 
+      - name: add PepperDash Eng Feed
         run: nuget sources add -name github -source https://nuget.pkg.github.com/pepperdash-engineering/index.json -username ${{ secrets.GH_PACKAGE_USER }} -password ${{ secrets.GH_PACKAGE_PASSWORD  }}
       - name: restore Nuget Packages
         run: nuget install .\packages.config -OutputDirectory .\packages -ExcludeVersion

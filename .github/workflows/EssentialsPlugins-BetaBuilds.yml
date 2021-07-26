@@ -14,7 +14,7 @@ env:
   # Defaults to debug for build type
   BUILD_TYPE: Debug
   # Defaults to master as the release branch.  Change as necessary
-  RELEASE_BRANCH: $default-branch
+  RELEASE_BRANCH: main
 jobs:
   Build_Project:
     runs-on: windows-latest
@@ -34,7 +34,7 @@ jobs:
         id: setVersionNumber
         shell: powershell
         run: |
-          $latestVersions = $(git tag --merged origin/$default-branch)
+          $latestVersions = $(git tag --merged origin/main)
           $latestVersion = [version]"0.0.0"
           Foreach ($version in $latestVersions) {
             Write-Host $version
@@ -54,7 +54,7 @@ jobs:
           $phase = ""
           $newVersionString = ""
           switch -regex ($Env:GITHUB_REF) {
-            '^refs\/heads\/$default-branch*.' {
+            '^refs\/heads\/main*.' {
               $newVersionString = "{0}.{1}.{2}" -f $newVersion.Major, $newVersion.Minor, $newVersion.Build
             }
             '^refs\/heads\/feature\/*.' {
@@ -122,7 +122,7 @@ jobs:
               Write-Output " ";
               Write-Output "Unable to apply version to AssemblyInfo.cs files";
           }
-      - name: add PepperDash Eng Feed 
+      - name: add PepperDash Eng Feed
         run: nuget sources add -name github -source https://nuget.pkg.github.com/pepperdash-engineering/index.json -username ${{ secrets.GH_PACKAGE_USER }} -password ${{ secrets.GH_PACKAGE_PASSWORD  }}
       - name: restore Nuget Packages
         run: nuget install .\packages.config -OutputDirectory .\packages -ExcludeVersion
