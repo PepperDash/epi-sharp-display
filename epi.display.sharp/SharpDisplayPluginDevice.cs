@@ -57,7 +57,9 @@ namespace PepperDash.Essentials.Sharp
         private readonly bool _displayEnabled;
         private readonly SharpDisplayPluginPoll _displayPoll;
         private readonly string _delimiter;
-        public List<string> InputLabels;
+
+        public List<string> InputLabels { get; private set; }
+
         private SharpDisplayPluginQueue _commandQueue;
         private SharpCommandTimer _commandTimer;
         private SharpDisplayProtocolCmdStyleBase _display;
