@@ -76,7 +76,7 @@ namespace PepperDash.Essentials.Sharp
 
             try
             {
-                _display = SharpDisplayPluginProtocolCmdStyleFactory.BuildSharpDislplay(this,
+                _display = SharpDisplayPluginProtocolCmdStyleFactory.BuildSharpDisplay(this,
                     deviceConfiguration.Protocol);
                 // A valid protocol retreived.
                 Debug.Console(2, this, "Added Display Name: {0}, Type: {1}, Comm: {2}", deviceConfiguration.Name,
@@ -491,7 +491,7 @@ namespace PepperDash.Essentials.Sharp
             }
             try
             {
-                _display = SharpDisplayPluginProtocolCmdStyleFactory.BuildSharpDislplay(this, protocol);
+                _display = SharpDisplayPluginProtocolCmdStyleFactory.BuildSharpDisplay(this, protocol);
             }
             catch (NullReferenceException nEx)
             {
