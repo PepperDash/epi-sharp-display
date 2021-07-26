@@ -1,13 +1,11 @@
 ﻿using System.Collections.Generic;
-using Epi.Display.Sharp.Inputs;
 using PepperDash.Core;
+using PepperDash.Essentials.Sharp.Inputs;
 
-
-namespace Epi.Display.Sharp.SharpDisplayProtocolCmdStyleClasses
+namespace PepperDash.Essentials.Sharp.SharpDisplayProtocolCmdStyleClasses
 {
     public class SharpDisplayProtocolCmdStyleNotDefined : SharpDisplayProtocolCmdStyleBase
     {
-
         public SharpDisplayProtocolCmdStyleNotDefined(SharpDisplayPluginDevice device)
             : base(device)
         {
@@ -23,7 +21,6 @@ namespace Epi.Display.Sharp.SharpDisplayProtocolCmdStyleClasses
 
         protected override void InitLocalPorts()
         {
-
         }
 
         public override string FormatParameter(string parameter)
@@ -40,8 +37,5 @@ namespace Epi.Display.Sharp.SharpDisplayProtocolCmdStyleClasses
         {
             Debug.Console(2, Debug.ErrorLogLevel.Error, "Protocol Style Not Defined");
         }
-
-
-
     }
 }

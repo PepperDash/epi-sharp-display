@@ -1,4 +1,4 @@
-﻿namespace Epi.Display.Sharp.DisplayEventArgs
+﻿namespace PepperDash.Essentials.Sharp.DisplayEventArgs
 {
     public class SharpDisplayPollEventArgs : System.EventArgs
     {

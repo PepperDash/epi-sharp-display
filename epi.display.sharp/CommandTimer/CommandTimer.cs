@@ -1,49 +1,51 @@
 ﻿using System;
 using Crestron.SimplSharp;
 
-namespace Epi.Display.Sharp.CommandTimer
+namespace PepperDash.Essentials.Sharp.CommandTimer
 {
     public class SharpCommandTimer
     {
-
-        private CTimer CommandTimer;
-        private ushort CountDownTime;
-
-
         public bool Running;
+        private CTimer _commandTimer;
+        private ushort _countDownTime;
 
-        
+
         //events
         public event EventHandler TimerCompleted;
         public event EventHandler TimerOneMinute;
         public event EventHandler TimerUpdate;
 
 
-
         //eventHandler
         public void RaiseEvent_TimerCompleted()
         {
             if (TimerCompleted != null)
+            {
                 TimerCompleted(this, EventArgs.Empty);
+            }
         }
 
         public void RaiseEvent_TimerOneMinute()
         {
             if (TimerOneMinute != null)
+            {
                 TimerOneMinute(this, EventArgs.Empty);
+            }
         }
 
         public void RaiseEvent_TimerUpdate()
         {
             if (TimerUpdate != null)
+            {
                 TimerUpdate(this, EventArgs.Empty);
+            }
         }
 
         public ushort ResumeTimer()
         {
-            if (!(CommandTimer.Disposed))
+            if (!(_commandTimer.Disposed))
             {
-                CommandTimer.Reset(1000, 1000);           
+                _commandTimer.Reset(1000, 1000);
             }
             return (0);
         }
@@ -51,71 +53,67 @@ namespace Epi.Display.Sharp.CommandTimer
 
         public ushort StartTimer(ushort timeInSeconds)
         {
-
-            CountDownTime = timeInSeconds;  // set count down time.
-            if (CommandTimer != null)      // Check if timer is null - not defined first time called 
+            _countDownTime = timeInSeconds; // set count down time.
+            if (_commandTimer != null) // Check if timer is null - not defined first time called 
             {
-                if (CommandTimer.Disposed)    // if timer has been disposed because it was stopped need to new
+                if (_commandTimer.Disposed) // if timer has been disposed because it was stopped need to new
                 {
-                    CommandTimer = new CTimer(QueueTimerCallBack, null, 1000, 1000);
-                    
+                    _commandTimer = new CTimer(QueueTimerCallBack, null, 1000, 1000);
                 }
                 else
                 {
-                    CommandTimer.Reset(1000, 1000); // timer in progress reset    
+                    _commandTimer.Reset(1000, 1000); // timer in progress reset    
                 }
             }
             else
             {
-                CommandTimer = new CTimer(QueueTimerCallBack, null, 1000, 1000);               
+                _commandTimer = new CTimer(QueueTimerCallBack, null, 1000, 1000);
             }
 
             Running = true;
             return (1);
-
         }
 
 
         public ushort StopTimer()
         {
-            CommandTimer.Stop();
-            CommandTimer.Dispose();
-            CountDownTime = 0;
+            _commandTimer.Stop();
+            _commandTimer.Dispose();
+            _countDownTime = 0;
 
             Running = false;
 
             return (0);
-        
         }
 
         public void SkipTimer()
         {
-            CountDownTime = 0;
-            CommandTimer.Reset();
-
+            _countDownTime = 0;
+            _commandTimer.Reset();
         }
 
 
         public ushort PauseTimer()
         {
-            CommandTimer.Stop();
+            _commandTimer.Stop();
             return (1);
-            
         }
 
         public string CurrentTime()
         {
-            return (String.Format("{0}:{1}", (CountDownTime / 60).ToString("D2"), (CountDownTime % 60).ToString("D2")));
+            return (String.Format("{0}:{1}", (_countDownTime/60).ToString("D2"), (_countDownTime%60).ToString("D2")));
         }
 
 
         public void QueueTimerCallBack(object state)
         {
-            if(CountDownTime > 0)
-                CountDownTime--;
+            if (_countDownTime > 0)
+            {
+                _countDownTime--;
+            }
             RaiseEvent_TimerUpdate();
             //CrestronConsole.PrintLine("Time Remaining: {0}:{1}", (countDownTime / 60).ToString("D2"), (countDownTime % 60).ToString("D2"));
-            switch (CountDownTime)
+            switch (_countDownTime)
             {
                 case 60:
                     RaiseEvent_TimerOneMinute();
@@ -127,5 +125,4 @@ namespace Epi.Display.Sharp.CommandTimer
             }
         }
     }
-
 }

@@ -1,6 +1,6 @@
 ﻿
 
-namespace Epi.Display.Sharp.Inputs
+namespace PepperDash.Essentials.Sharp.Inputs
 {
     public class SharpDisplayPluginInput
     {

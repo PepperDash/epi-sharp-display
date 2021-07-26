@@ -1,11 +1,11 @@
-﻿using Epi.Display.Sharp.SharpDisplayProtocolCmdStyleClasses;
-using PepperDash.Core;
+﻿using PepperDash.Core;
+using PepperDash.Essentials.Sharp.SharpDisplayProtocolCmdStyleClasses;
 
-namespace Epi.Display.Sharp
+namespace PepperDash.Essentials.Sharp
 {
     public static class SharpDisplayPluginProtocolCmdStyleFactory
     {
-        internal static SharpDisplayProtocolCmdStyleBase BuildSharpDislplay(SharpDisplayPluginDevice display, string displayConfig)
+        internal static SharpDisplayProtocolCmdStyleBase BuildSharpDisplay(SharpDisplayPluginDevice display, string displayConfig)
         {
             // Get config value for protocol style and return protocol
 
