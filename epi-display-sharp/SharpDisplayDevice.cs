@@ -683,14 +683,25 @@ namespace PepperDash.Plugins.SharpDisplay
 		public void UpdateInputFb(string s)
 		{
 			var newInput = InputPorts.FirstOrDefault(i => i.FeedbackMatchObject.Equals(s.ToLower()));
-			if (newInput == _currentInputPort) return;
+			if (newInput == null)
+			{
+				Debug.Console(0, this, "UpdateInputFb newInput is {0}", newInput == null ? "null" : "not null");
+				return;
+			}
+			if (newInput == _currentInputPort)
+			{
+				Debug.Console(0, this, "UpdateInputFb _currentInputPort ({0}) == newInput ({1})", _currentInputPort.Key, newInput.Key);
+				return;
+			}
 
-			Debug.Console(0, this, "UpdateInputFb newInput key: {0}, port: {1}", newInput.Key, newInput.Port.ToString());
+			Debug.Console(0, this, "UpdateInputFb newInput key: {0}, connectionType: {1}, feedbackMatchObject: {2}",
+				newInput.Key, newInput.ConnectionType, newInput.FeedbackMatchObject);
 
 			_currentInputPort = newInput;
 			CurrentInputFeedback.FireUpdate();
 
 			var key = newInput.Key;
+			Debug.Console(0, this, "UpdateInputFb key: {0}", key);
 			switch (key)
 			{
 				case "hdmiIn1":
