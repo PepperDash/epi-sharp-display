@@ -9,10 +9,11 @@ using PepperDash.Essentials.Core;
 using PepperDash.Essentials.Core.Bridges;
 using PepperDash.Essentials.Core.Queues;
 using PepperDash.Essentials.Core.Routing;
+using PepperDash.Essentials.Devices.Displays;
 
 namespace PepperDash.Plugins.SharpDisplay
 {
-	public class SharpDisplayController : TwoWayDisplayBase, IBasicVolumeWithFeedback, ICommunicationMonitor,
+	public class SharpDisplayController : TwoWayDisplayBase, IBasicVolumeWithFeedback, ICommunicationMonitor, IInputHdmi1, IInputHdmi2, IInputHdmi3, IInputDisplayPort1,
 		IBridgeAdvanced
 	{
 
@@ -354,7 +355,7 @@ namespace PepperDash.Plugins.SharpDisplay
 				new RoutingInputPort(RoutingPortNames.HdmiIn1, eRoutingSignalType.Audio | eRoutingSignalType.Video,
 					eRoutingPortConnectionType.Hdmi, new Action(InputHdmi1), this), "9");
 			AddRoutingInputPort(
-				new RoutingInputPort(RoutingPortNames.HdmiIn2, eRoutingSignalType.Audio | eRoutingSignalType.Video,
+				new RoutingInputPort(RoutingPortNames.HdmiIn1PC, eRoutingSignalType.Audio | eRoutingSignalType.Video,
 					eRoutingPortConnectionType.Hdmi, new Action(InputHdmi2), this), "10");
 
 			AddRoutingInputPort(
@@ -417,7 +418,7 @@ namespace PepperDash.Plugins.SharpDisplay
 			{
 				case "POWR":
 					{
-						if(data[0].Contains("OK"))
+						if (data[0].Contains("OK"))
 							PowerGet();
 						else
 							UpdatePowerFb(data[0]);
@@ -460,9 +461,9 @@ namespace PepperDash.Plugins.SharpDisplay
 		{
 			if (string.IsNullOrEmpty(cmd)) return;
 
-			if(string.IsNullOrEmpty(cmdValue))
+			if (string.IsNullOrEmpty(cmdValue))
 				cmdValue = "?";
-			
+
 			var data = ZeroPadCommands ?
 				string.Format("{0}{1,4:0}", cmd, cmdValue) :
 				string.Format("{0}{1,4:#}", cmd, cmdValue);
@@ -628,6 +629,22 @@ namespace PepperDash.Plugins.SharpDisplay
 		}
 
 		/// <summary>
+		/// Select Hdmi 3
+		/// </summary>
+		public void InputHdmi3()
+		{
+			SendData("INPS", "7");
+		}
+
+		/// <summary>
+		/// Select display port 1
+		/// </summary>
+		public void InputDisplayPort1()
+		{
+			SendData("INPS", "1");
+		}
+
+		/// <summary>
 		/// Select DVI 1 Input (AV)
 		/// </summary>
 		public void InputDvi1()
@@ -641,6 +658,14 @@ namespace PepperDash.Plugins.SharpDisplay
 		public void InputDvi2()
 		{
 			SendData("INPS", "1");
+		}
+
+		/// <summary>
+		/// Toggles the display input
+		/// </summary>
+		public void InputToggle()
+		{
+			SendData("INPS", "0");
 		}
 
 		/// <summary>
@@ -661,7 +686,7 @@ namespace PepperDash.Plugins.SharpDisplay
 			if (newInput == _currentInputPort) return;
 
 			Debug.Console(0, this, "UpdateInputFb newInput key: {0}, port: {1}", newInput.Key, newInput.Port.ToString());
-			
+
 			_currentInputPort = newInput;
 			CurrentInputFeedback.FireUpdate();
 
