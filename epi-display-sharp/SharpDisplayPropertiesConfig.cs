@@ -7,8 +7,8 @@ namespace PepperDash.Plugins.SharpDisplay
 		/// <summary>
 		/// Character used to pad the command, defaults to " " (\x20) if not defined
 		/// </summary>
-        [JsonProperty("padCommands")]
-        public bool PadCommands { get; set; }
+		[JsonProperty("zeroPadCommands")]
+        public bool ZeroPadCommands { get; set; }
 
 		/// <summary>
 		/// Device volume upper limit, 100

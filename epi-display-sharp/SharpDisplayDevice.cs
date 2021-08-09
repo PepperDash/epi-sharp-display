@@ -57,7 +57,7 @@ namespace PepperDash.Plugins.SharpDisplay
 				Debug.Console(0, this, Debug.ErrorLogLevel.Error, "Display configuration must be included");
 				return;
 			}
-			PadCommands = props.PadCommands;
+			ZeroPadCommands = props.ZeroPadCommands;
 			_upperLimit = props.volumeUpperLimit;
 			_lowerLimit = props.VolumeLowerLimit;
 			_pollIntervalMs = props.PollIntervalMs > 30000 ? props.PollIntervalMs : 30000;
@@ -74,7 +74,7 @@ namespace PepperDash.Plugins.SharpDisplay
 		public IBasicCommunication Communication { get; private set; }
 		public CommunicationGather PortGather { get; private set; }
 
-		public bool PadCommands { get; private set; }
+		public bool ZeroPadCommands { get; private set; }
 
 		public bool PowerIsOn
 		{
@@ -456,7 +456,7 @@ namespace PepperDash.Plugins.SharpDisplay
 			if (string.IsNullOrEmpty(cmd)) return;
 
 			// 
-			var data = PadCommands ?
+			var data = ZeroPadCommands ?
 				string.Format("{0}{1,4:0}", cmd, cmdValue) :
 				string.Format("{0}{1,4:#}", cmd, cmdValue);
 
