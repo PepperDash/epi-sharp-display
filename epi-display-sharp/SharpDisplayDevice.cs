@@ -57,12 +57,12 @@ namespace PepperDash.Plugins.SharpDisplay
 				Debug.Console(0, this, Debug.ErrorLogLevel.Error, "Display configuration must be included");
 				return;
 			}
-			Id = string.IsNullOrEmpty(props.Id) ? props.Id : "01";
+			PadCommands = props.PadCommands;
 			_upperLimit = props.volumeUpperLimit;
-			_lowerLimit = props.volumeLowerLimit;
-			_pollIntervalMs = props.pollIntervalMs > 1999 ? props.pollIntervalMs : 10000;
-			_coolingTimeMs = props.coolingTimeMs > 0 ? props.coolingTimeMs : 10000;
-			_warmingTimeMs = props.warmingTimeMs > 0 ? props.warmingTimeMs : 8000;
+			_lowerLimit = props.VolumeLowerLimit;
+			_pollIntervalMs = props.PollIntervalMs > 30000 ? props.PollIntervalMs : 30000;
+			_coolingTimeMs = props.CoolingTimeMs > 9999 ? props.CoolingTimeMs : 15000;
+			_warmingTimeMs = props.WarmingTimeMs > 9999 ? props.WarmingTimeMs : 15000;
 
 			_pollVolume = props.PollVolume;
 
@@ -74,7 +74,7 @@ namespace PepperDash.Plugins.SharpDisplay
 		public IBasicCommunication Communication { get; private set; }
 		public CommunicationGather PortGather { get; private set; }
 
-		public string Id { get; private set; }
+		public bool PadCommands { get; private set; }
 
 		public bool PowerIsOn
 		{
@@ -212,7 +212,7 @@ namespace PepperDash.Plugins.SharpDisplay
 				scaled = (int)NumericalHelpers.Scale(level, 0, 65535, _lowerLimit, _upperLimit);
 			}
 
-			SendData(Id == "01" ? string.Format("VOLM{0,4:0}", scaled) : string.Format("VOLM{0,4:#}", scaled));
+			SendData("VOLM", scaled.ToString(CultureInfo.InvariantCulture));
 		}
 
 		/// <summary>
@@ -220,7 +220,7 @@ namespace PepperDash.Plugins.SharpDisplay
 		/// </summary>
 		public void MuteOn()
 		{
-			SendData(Id == "01" ? string.Format("MUTE{0,4:0}", "1") : string.Format("MUTE{0,4:#}", "1"));
+			SendData("MUTE", "1");
 		}
 
 		/// <summary>
@@ -228,7 +228,7 @@ namespace PepperDash.Plugins.SharpDisplay
 		/// </summary>
 		public void MuteOff()
 		{
-			SendData(Id == "01" ? string.Format("MUTE{0,4:0}", "0") : string.Format("MUTE{0,4:#}", "0"));
+			SendData("MUTE", "0");
 		}
 
 		/// <summary>
@@ -393,11 +393,14 @@ namespace PepperDash.Plugins.SharpDisplay
 
 		private void ProcessResponse(string s)
 		{
-			Debug.Console(0, this, "ProcessResponse: {0}", s);
+			// get current last command in case the string has changed
+			var last = _lastCommandSent;
+
+			Debug.Console(0, this, "ProcessResponse: {0} | last: {1}", s, last);
 			var data = s.Trim().Split(' ');
 
 			Debug.Console(0, this, "ProcessResponse data.Count(): {0}", data.Count());
-			for(var i = 0; i < data.Count(); i++)
+			for (var i = 0; i < data.Count(); i++)
 				Debug.Console(0, this, "ProcessResponse data[{0}]: {1}", i, data[i]);
 
 			if (data[0].Contains("ERR"))
@@ -406,7 +409,7 @@ namespace PepperDash.Plugins.SharpDisplay
 				return;
 			}
 
-			switch (_lastCommandSent)
+			switch (last)
 			{
 				case "POWR":
 					{
@@ -441,60 +444,25 @@ namespace PepperDash.Plugins.SharpDisplay
 						break;
 					}
 			}
-
-			//string command;
-			//string id;
-			//string responseValue;
-
-			//if (data.Length < 3)
-			//{
-			//    Debug.Console(2, this, "Unable to parse message, not enough data in message: {0}", s);
-			//    return;      
-			//}
-			//else
-			//{
-			//    command = data[0];
-			//    id = data[1];
-			//    responseValue = data[2];
-			//}
-
-			//if (!id.Equals(Id))
-			//{
-			//    Debug.Console(2, this, "Device ID Mismatch - Discarding Response");
-			//    return;
-			//}
-
-			////command = 'ka' 
-			//switch (command)
-			//{
-			//    case ("a"):
-			//        UpdatePowerFb(responseValue);
-			//        break;
-			//    case ("b"):
-			//        UpdateInputFb(responseValue);
-			//        break;
-			//    case ("f"):
-			//        UpdateVolumeFb(responseValue);
-			//        break;
-			//    case ("e"):
-			//        UpdateMuteFb(responseValue);
-			//        break;
-			//}
 		}
 
 
 		/// <summary>
 		/// Formats an outgoing message
-		/// 
 		/// </summary>
-		/// <param name="s"></param>
-		private void SendData(string s)
+		/// <param name="cmd"></param>
+		private void SendData(string cmd, string cmdValue)
 		{
-			if (string.IsNullOrEmpty(s)) return;
+			if (string.IsNullOrEmpty(cmd)) return;
 
-			Communication.SendText(s + "\x0D\x0A");
+			// 
+			var data = PadCommands ?
+				string.Format("{0}{1,4:0}", cmd, cmdValue) :
+				string.Format("{0}{1,4:#}", cmd, cmdValue);
 
-			_lastCommandSent = s.Substring(0, 4);
+			Communication.SendText(data + "\x0D\x0A");
+
+			_lastCommandSent = cmd;
 			Debug.Console(0, this, "SendData _lastCommandSent: {0}", _lastCommandSent);
 		}
 
@@ -546,7 +514,7 @@ namespace PepperDash.Plugins.SharpDisplay
 		/// </summary>
 		public void MuteGet()
 		{
-			SendData("MUTE");
+			SendData("MUTE", "?");
 		}
 
 		/// <summary>
@@ -554,7 +522,7 @@ namespace PepperDash.Plugins.SharpDisplay
 		/// </summary>
 		public void VolumeGet()
 		{
-			SendData("VOLM");
+			SendData("VOLM", "?");
 		}
 
 		/// <summary>
@@ -632,7 +600,7 @@ namespace PepperDash.Plugins.SharpDisplay
 		/// </summary>
 		public void InputHdmi1()
 		{
-			SendData(Id == "01" ? string.Format("INPS{0,4:0}", "9") : string.Format("INPS{0,4:#}", "9"));
+			SendData("INPS", "9");
 		}
 
 		/// <summary>
@@ -640,7 +608,7 @@ namespace PepperDash.Plugins.SharpDisplay
 		/// </summary>
 		public void InputHdmi2()
 		{
-			SendData(Id == "01" ? string.Format("INPS{0,4:0}", "10") : string.Format("INPS{0,4:#}", "10"));
+			SendData("INPS", "10");
 		}
 
 		/// <summary>
@@ -648,7 +616,7 @@ namespace PepperDash.Plugins.SharpDisplay
 		/// </summary>
 		public void InputDvi1()
 		{
-			SendData(Id == "01" ? string.Format("INPS{0,4:0}", "7") : string.Format("INPS{0,4:#}", "7"));
+			SendData("INPS", "7");
 		}
 
 		/// <summary>
@@ -656,7 +624,7 @@ namespace PepperDash.Plugins.SharpDisplay
 		/// </summary>
 		public void InputDvi2()
 		{
-			SendData(Id == "01" ? string.Format("INPS{0,4:0}", "1") : string.Format("INPS{0,4:#}", "1"));
+			SendData("INPS", "1");
 		}
 
 		/// <summary>
@@ -664,7 +632,7 @@ namespace PepperDash.Plugins.SharpDisplay
 		/// </summary>
 		public void InputGet()
 		{
-			SendData("INPS");
+			SendData("INPS", "?");
 		}
 
 		/// <summary>
@@ -739,7 +707,7 @@ namespace PepperDash.Plugins.SharpDisplay
 		{
 			if (_isSerialComm)
 			{
-				SendData(Id == "01" ? string.Format("POWR{0,4:0}", "1") : string.Format("POWR{0,4:#}", "1"));
+				SendData("POWR", "1");
 			}
 		}
 
@@ -748,7 +716,7 @@ namespace PepperDash.Plugins.SharpDisplay
 		/// </summary>
 		public override void PowerOff()
 		{
-			SendData(Id == "01" ? string.Format("POWR{0,4:0}", "0") : string.Format("POWR{0,4:#}", "0"));
+			SendData("POWR", "0");
 		}
 
 		/// <summary>
@@ -756,7 +724,7 @@ namespace PepperDash.Plugins.SharpDisplay
 		/// </summary>
 		public void PowerGet()
 		{
-			SendData("POWR");
+			SendData("POWR", "?");
 		}
 
 
@@ -792,18 +760,17 @@ namespace PepperDash.Plugins.SharpDisplay
 		/// </summary>
 		public void StatusGet()
 		{
-			//SendBytes(new byte[] { Header, StatusControlCmd, 0x00, 0x00, StatusControlGet, 0x00 });
 			CrestronInvoke.BeginInvoke((o) =>
 			{
 				PowerGet();
-				CrestronEnvironment.Sleep(100);
+				CrestronEnvironment.Sleep(2000);
 				InputGet();
 
 				if (!_pollVolume) return;
 
-				CrestronEnvironment.Sleep(100);
+				CrestronEnvironment.Sleep(2000);
 				VolumeGet();
-				CrestronEnvironment.Sleep(100);
+				CrestronEnvironment.Sleep(2000);
 				MuteGet();
 			});
 		}
