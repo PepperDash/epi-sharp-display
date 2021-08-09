@@ -13,7 +13,7 @@ This plugin is designed to work with Sharp Displays controlled via TCP/IP or RS-
   "key": "display-1",
   "uid": 4,
   "type": "sharpDisplay",
-  "name": "Main Display",
+  "name": "Display",
   "group": "display",
   "properties": {
     "control": {
@@ -30,9 +30,13 @@ This plugin is designed to work with Sharp Displays controlled via TCP/IP or RS-
         "stopBits": 1
       }
     },
-    "Enabled": true,
-    "Name": "Main Display",
-    "Protocol": ""
+    "id": "00",
+    "volumeUpperLimit": 100,
+    "volumeLowerLimit": 0,
+    "pollIntervalMs": 60000,
+    "pollVolume": false,
+    "coolingTimeMs": 15000,
+    "warmingTimeMs": 15000
   }
 }
 ```
@@ -44,7 +48,7 @@ This plugin is designed to work with Sharp Displays controlled via TCP/IP or RS-
   "key": "display-1",
   "uid": 4,
   "type": "sharpDisplay",
-  "name": "Main Display",
+  "name": "Display",
   "group": "display",
   "properties": {
     "control": {
@@ -59,20 +63,23 @@ This plugin is designed to work with Sharp Displays controlled via TCP/IP or RS-
         "bufferSize": 32768
       }
     },
-    "Enabled": true,
-    "Name": "Main Display",
-    "Protocol": ""
+    "id": "01",
+    "volumeUpperLimit": 100,
+    "volumeLowerLimit": 0,
+    "pollIntervalMs": 60000,
+    "pollVolume": false,
+    "coolingTimeMs": 15000,
+    "warmingTimeMs": 15000
   }
 }
 ```
 
-### Available Protocols
+### ID
 
-| Protocol | Description           | Config Value |
-| -------- | --------------------- | ------------ |
-| PN-UH501 | For PN-UH501 Displays | PN-UH501     |
-
-- All other values including an empty string will use the default command format.
+| ID   | Description              | Example            |
+| ---- | ------------------------ | ------------------ |
+| "00" | Pads command with spaces | "POWR   1\x0D\x0A" |
+| "01" | Pads command with 0's    | "POWR0001\x0D\x0A" |
 
 ## License
 
