@@ -683,11 +683,7 @@ namespace PepperDash.Plugins.SharpDisplay
 		public void UpdateInputFb(string s)
 		{
 			var newInput = InputPorts.FirstOrDefault(i => i.FeedbackMatchObject.Equals(s.ToLower()));
-			if (newInput == null)
-			{
-				Debug.Console(0, this, "UpdateInputFb newInput is {0}", newInput == null ? "null" : "not null");
-				return;
-			}
+			if (newInput == null) return;
 			if (newInput == _currentInputPort)
 			{
 				Debug.Console(0, this, "UpdateInputFb _currentInputPort ({0}) == newInput ({1})", _currentInputPort.Key, newInput.Key);
