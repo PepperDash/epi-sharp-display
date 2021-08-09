@@ -30,7 +30,7 @@ This plugin is designed to work with Sharp Displays controlled via TCP/IP or RS-
         "stopBits": 1
       }
     },
-    "id": "00",
+    "zeroPadCommands": false,
     "volumeUpperLimit": 100,
     "volumeLowerLimit": 0,
     "pollIntervalMs": 60000,
@@ -63,7 +63,7 @@ This plugin is designed to work with Sharp Displays controlled via TCP/IP or RS-
         "bufferSize": 32768
       }
     },
-    "id": "01",
+    "zeroPadCommands": true,
     "volumeUpperLimit": 100,
     "volumeLowerLimit": 0,
     "pollIntervalMs": 60000,
@@ -74,12 +74,30 @@ This plugin is designed to work with Sharp Displays controlled via TCP/IP or RS-
 }
 ```
 
-### ID
+### Pad Commands
+Optional boolean value to configure if commands should be padded with zeros. If not present defaults to padding commands with " " (\x20).
 
-| ID   | Description              | Example            |
-| ---- | ------------------------ | ------------------ |
-| "00" | Pads command with spaces | "POWR   1\x0D\x0A" |
-| "01" | Pads command with 0's    | "POWR0001\x0D\x0A" |
+#### Commands without Zero Pad
+Configuration
+```json
+"zeroPadCommands": false,
+```
+Command Structure
+```
+"POWR   1\x0D0A";
+```
+
+#### Commands with Zero Pad
+Configuration
+```json
+"zeroPadCommands": true,
+```
+Command Structure
+```
+"INPS0013\x0D\x0A";
+```
+
+
 
 ## License
 
