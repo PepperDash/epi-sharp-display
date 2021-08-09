@@ -2,16 +2,13 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
-using System.Text.RegularExpressions;
 using Crestron.SimplSharp;
 using Crestron.SimplSharpPro.DeviceSupport;
-using Crestron.SimplSharpPro.DM;
 using PepperDash.Core;
 using PepperDash.Essentials.Core;
 using PepperDash.Essentials.Core.Bridges;
-using PepperDash.Essentials.Core.Routing;
-
 using PepperDash.Essentials.Core.Queues;
+using PepperDash.Essentials.Core.Routing;
 
 namespace PepperDash.Plugins.SharpDisplay
 {
@@ -393,19 +390,26 @@ namespace PepperDash.Plugins.SharpDisplay
 
 		private void ProcessResponse(string s)
 		{
+			// ex poll tx/rx
+			// Tx: "POWR   ?\x0D\x0A"
+			// Rx: "{POWR_STATE:0,1} 001"
+			// ex command tx/rx
+			// Tx: "POWR   1\x0D\x0A"
+			// Rx: "OK 001"
+
 			// get current last command in case the string has changed
 			var last = _lastCommandSent;
 
-			Debug.Console(0, this, "ProcessResponse: {0} | last: {1}", s, last);
+			Debug.Console(1, this, "ProcessResponse: {0} | last: {1}", s, last);
 			var data = s.Trim().Split(' ');
 
-			Debug.Console(0, this, "ProcessResponse data.Count(): {0}", data.Count());
-			for (var i = 0; i < data.Count(); i++)
-				Debug.Console(0, this, "ProcessResponse data[{0}]: {1}", i, data[i]);
+			//Debug.Console(2, this, "ProcessResponse data.Count(): {0}", data.Count());
+			//for (var i = 0; i < data.Count(); i++)
+			//    Debug.Console(2, this, "ProcessResponse data[{0}]: {1}", i, data[i]);
 
-			if (data[0].Contains("ERR"))
+			if (data[0].Contains("ERR") || data[0].Contains("WAIT"))
 			{
-				Debug.Console(0, this, "ProcessResponse data[0] = {0}, exiting", data[0]);
+				Debug.Console(2, this, "ProcessResponse data[0] = {0}, exiting", data[0]);
 				return;
 			}
 
@@ -413,34 +417,34 @@ namespace PepperDash.Plugins.SharpDisplay
 			{
 				case "POWR":
 					{
-						if (data.Length == 1)
+						if(data[0].Contains("OK"))
 							PowerGet();
 						else
-							UpdatePowerFb(data[1]);
+							UpdatePowerFb(data[0]);
 						break;
 					}
 				case "INPS":
 					{
-						if (data.Length == 1)
+						if (data.Contains("OK"))
 							InputGet();
 						else
-							UpdateInputFb(data[1]);
+							UpdateInputFb(data[0]);
 						break;
 					}
 				case "VOLM":
 					{
-						if (data.Length == 1)
+						if (data.Contains("OK"))
 							VolumeGet();
 						else
-							UpdateVolumeFb(data[1]);
+							UpdateVolumeFb(data[0]);
 						break;
 					}
 				case "MUTE":
 					{
-						if (data.Length == 1)
+						if (data.Contains("OK"))
 							MuteGet();
 						else
-							UpdateMuteFb(data[1]);
+							UpdateMuteFb(data[0]);
 						break;
 					}
 			}
@@ -451,11 +455,14 @@ namespace PepperDash.Plugins.SharpDisplay
 		/// Formats an outgoing message
 		/// </summary>
 		/// <param name="cmd"></param>
+		/// <param name="cmdValue"></param>
 		private void SendData(string cmd, string cmdValue)
 		{
 			if (string.IsNullOrEmpty(cmd)) return;
 
-			// 
+			if(string.IsNullOrEmpty(cmdValue))
+				cmdValue = "?";
+			
 			var data = ZeroPadCommands ?
 				string.Format("{0}{1,4:0}", cmd, cmdValue) :
 				string.Format("{0}{1,4:#}", cmd, cmdValue);
@@ -463,7 +470,7 @@ namespace PepperDash.Plugins.SharpDisplay
 			Communication.SendText(data + "\x0D\x0A");
 
 			_lastCommandSent = cmd;
-			Debug.Console(0, this, "SendData _lastCommandSent: {0}", _lastCommandSent);
+			Debug.Console(1, this, "SendData _lastCommandSent: {0}", _lastCommandSent);
 		}
 
 		/// <summary>
@@ -595,6 +602,15 @@ namespace PepperDash.Plugins.SharpDisplay
 			InputPorts.Add(port);
 		}
 
+		public void ListRoutingInputPorts()
+		{
+			foreach (var inputPort in InputPorts)
+			{
+				Debug.Console(0, this, "inputPort key: {0}, connectionType: {1}, feedbackMatchObject: {2}",
+					inputPort.Key, inputPort.ConnectionType, inputPort.FeedbackMatchObject);
+			}
+		}
+
 		/// <summary>
 		/// Select Hdmi 1 Input (AV)
 		/// </summary>
@@ -642,26 +658,28 @@ namespace PepperDash.Plugins.SharpDisplay
 		public void UpdateInputFb(string s)
 		{
 			var newInput = InputPorts.FirstOrDefault(i => i.FeedbackMatchObject.Equals(s.ToLower()));
-			if (newInput != null && newInput != _currentInputPort)
+			if (newInput == _currentInputPort) return;
+
+			Debug.Console(0, this, "UpdateInputFb newInput key: {0}, port: {1}", newInput.Key, newInput.Port.ToString());
+			
+			_currentInputPort = newInput;
+			CurrentInputFeedback.FireUpdate();
+
+			var key = newInput.Key;
+			switch (key)
 			{
-				_currentInputPort = newInput;
-				CurrentInputFeedback.FireUpdate();
-				var key = newInput.Key;
-				switch (key)
-				{
-					case "hdmiIn1":
-						InputNumber = 1;
-						break;
-					case "hdmiIn2":
-						InputNumber = 2;
-						break;
-					case "dvi":
-						InputNumber = 3;
-						break;
-					case "dvi1":
-						InputNumber = 4;
-						break;
-				}
+				case "hdmiIn1":
+					InputNumber = 1;
+					break;
+				case "hdmiIn2":
+					InputNumber = 2;
+					break;
+				case "dvi":
+					InputNumber = 3;
+					break;
+				case "dvi1":
+					InputNumber = 4;
+					break;
 			}
 		}
 
