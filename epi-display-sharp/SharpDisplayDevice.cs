@@ -4,6 +4,7 @@ using System.Globalization;
 using System.Linq;
 using Crestron.SimplSharp;
 using Crestron.SimplSharpPro.DeviceSupport;
+using Crestron.SimplSharpPro.DM;
 using PepperDash.Core;
 using PepperDash.Essentials.Core;
 using PepperDash.Essentials.Core.Bridges;
@@ -13,7 +14,7 @@ using PepperDash.Essentials.Devices.Displays;
 
 namespace PepperDash.Plugins.SharpDisplay
 {
-	public class SharpDisplayController : TwoWayDisplayBase, IBasicVolumeWithFeedback, ICommunicationMonitor, IInputHdmi1, IInputHdmi2, IInputHdmi3, IInputDisplayPort1,
+	public class SharpDisplayController : TwoWayDisplayBase, IBasicVolumeWithFeedback, ICommunicationMonitor, IInputHdmi1, IInputHdmi2, IInputHdmi3, IInputDisplayPort1, IInputVga1,
 		IBridgeAdvanced
 	{
 
@@ -363,8 +364,8 @@ namespace PepperDash.Plugins.SharpDisplay
 					eRoutingPortConnectionType.Dvi, new Action(InputDvi1), this), "7");
 
 			AddRoutingInputPort(
-				new RoutingInputPort(RoutingPortNames.DviIn1, eRoutingSignalType.Audio | eRoutingSignalType.Video,
-					eRoutingPortConnectionType.Dvi, new Action(InputDvi2), this), "1");
+				new RoutingInputPort(RoutingPortNames.VgaIn1, eRoutingSignalType.Audio | eRoutingSignalType.Video,
+					eRoutingPortConnectionType.Vga, new Action(InputVga1), this), "2");
 		}
 
 		public override bool CustomActivate()
@@ -613,7 +614,7 @@ namespace PepperDash.Plugins.SharpDisplay
 		}
 
 		/// <summary>
-		/// Select Hdmi 1 Input (AV)
+		/// Select Hdmi 1 Input (AV HDMI)
 		/// </summary>
 		public void InputHdmi1()
 		{
@@ -621,7 +622,7 @@ namespace PepperDash.Plugins.SharpDisplay
 		}
 
 		/// <summary>
-		/// Select Hdmi 2 Input (PC)
+		/// Select Hdmi 2 Input (PC HDMI)
 		/// </summary>
 		public void InputHdmi2()
 		{
@@ -629,7 +630,7 @@ namespace PepperDash.Plugins.SharpDisplay
 		}
 
 		/// <summary>
-		/// Select Hdmi 3
+		/// Select Hdmi 3 (AV DVI-D)
 		/// </summary>
 		public void InputHdmi3()
 		{
@@ -637,7 +638,7 @@ namespace PepperDash.Plugins.SharpDisplay
 		}
 
 		/// <summary>
-		/// Select display port 1
+		/// Select display port 1 (PC DVI-D)
 		/// </summary>
 		public void InputDisplayPort1()
 		{
@@ -653,11 +654,19 @@ namespace PepperDash.Plugins.SharpDisplay
 		}
 
 		/// <summary>
-		/// Select DVI 2 Input (PC)
+		/// Select DVI 2 Input (PC DVI-D)
 		/// </summary>
 		public void InputDvi2()
 		{
 			SendData("INPS", "1");
+		}
+
+		/// <summary>
+		/// Select VGA 1 Input (PC D-Sub)
+		/// </summary>
+		public void InputVga1()
+		{
+			SendData("INPS","2");
 		}
 
 		/// <summary>
@@ -710,6 +719,9 @@ namespace PepperDash.Plugins.SharpDisplay
 					InputNumber = 3;
 					break;
 				case "dvi1":
+					InputNumber = 5;
+					break;
+				case "vga1":
 					InputNumber = 4;
 					break;
 			}
