@@ -14,7 +14,8 @@ using PepperDash.Essentials.Devices.Displays;
 
 namespace PepperDash.Plugins.SharpDisplay
 {
-	public class SharpDisplayController : TwoWayDisplayBase, IBasicVolumeWithFeedback, ICommunicationMonitor, IInputHdmi1, IInputHdmi2, IInputHdmi3, IInputDisplayPort1, IInputVga1,
+	public class SharpDisplayController : TwoWayDisplayBase, IBasicVolumeWithFeedback, ICommunicationMonitor, 
+		IInputHdmi1, IInputHdmi2, IInputHdmi3, IInputDisplayPort1, IInputVga1,
 		IBridgeAdvanced
 	{
 
