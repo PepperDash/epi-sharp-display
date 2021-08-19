@@ -43,6 +43,7 @@ namespace PepperDash.Plugins.SharpDisplay
 		private ushort _volumeLevelForSig;
 		private bool _pollVolume;
 		private string _lastCommandSent;
+		private int _pollSequence;
 
 		public SharpDisplayController(string key, string name, SharpDisplayPropertiesConfig config, IBasicCommunication comms)
 			: base(key, name)
@@ -454,6 +455,15 @@ namespace PepperDash.Plugins.SharpDisplay
 		}
 
 
+		public void SendDataRaw(string cmd)
+		{
+			if (string.IsNullOrEmpty(cmd)) return;
+
+			Communication.SendText(cmd + "\x0D\x0A");
+
+			Debug.Console(1, this, "SendDataRaw: {0}", cmd);
+		}
+
 		/// <summary>
 		/// Formats an outgoing message
 		/// </summary>
@@ -465,11 +475,17 @@ namespace PepperDash.Plugins.SharpDisplay
 
 			if (string.IsNullOrEmpty(cmdValue))
 				cmdValue = "?";
-
-			var data = ZeroPadCommands ?
-				string.Format("{0}{1,4:0}", cmd, cmdValue) :
-				string.Format("{0}{1,4:#}", cmd, cmdValue);
-
+			
+			string data;
+			if (ZeroPadCommands)
+			{
+				data = string.Format("{0}{1}", cmd, cmdValue.PadLeft(4,'0'));
+			}
+			else 
+			{
+				data = string.Format("{0}{1}", cmd, cmdValue.PadLeft(4,' '));
+			}
+			
 			Communication.SendText(data + "\x0D\x0A");
 
 			_lastCommandSent = cmd;
@@ -786,7 +802,7 @@ namespace PepperDash.Plugins.SharpDisplay
 		/// Poll Power
 		/// </summary>
 		public void PowerGet()
-		{
+		{			
 			SendData("POWR", "?");
 		}
 
@@ -823,19 +839,17 @@ namespace PepperDash.Plugins.SharpDisplay
 		/// </summary>
 		public void StatusGet()
 		{
-			CrestronInvoke.BeginInvoke((o) =>
+			switch (_pollSequence)
 			{
-				PowerGet();
-				CrestronEnvironment.Sleep(2000);
-				InputGet();
-
-				if (!_pollVolume) return;
-
-				CrestronEnvironment.Sleep(2000);
-				VolumeGet();
-				CrestronEnvironment.Sleep(2000);
-				MuteGet();
-			});
+				case 1: SendData("RSPW", "1"); break;
+				case 2: PowerGet(); break;
+				case 3: InputGet(); break;
+				case 4: VolumeGet(); break;
+				case 5: MuteGet(); break;
+				default: _pollSequence = 0; break;
+			}
+			_pollSequence++;
+			
 		}
 	}
 }
