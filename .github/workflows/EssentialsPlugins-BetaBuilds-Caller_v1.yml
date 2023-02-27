@@ -1,9 +1,6 @@
 name: Beta Build
 
-on:
-  push:
-    branches-ignore:   
-      - main
+on: push
 
 env:
   call-workflow:
