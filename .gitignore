@@ -359,3 +359,4 @@ MigrationBackup/
 
 # VS Code settings folders
 .vscode/
+.github/workflows/._EssentialsPlugins-BetaBuilds.yml

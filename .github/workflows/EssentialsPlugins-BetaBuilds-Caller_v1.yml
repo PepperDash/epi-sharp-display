@@ -6,8 +6,8 @@ on:
       - main
 
 env:
-  call-workflow-passing-data:
+  call-workflow:
     permissions:
       contents: read
-      pull-requests: write
+    pull-requests: write
     uses: PepperDash/workflow-templates/.github/workflows/essentialsplugins-betabuilds.yml@main
