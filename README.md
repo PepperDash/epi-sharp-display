@@ -13,7 +13,7 @@ This plugin is designed to work with Sharp Displays controlled via TCP/IP or RS-
   "key": "display-1",
   "uid": 4,
   "type": "sharpDisplay",
-  "name": "Main Display",
+  "name": "Display",
   "group": "display",
   "properties": {
     "control": {
@@ -30,9 +30,13 @@ This plugin is designed to work with Sharp Displays controlled via TCP/IP or RS-
         "stopBits": 1
       }
     },
-    "Enabled": true,
-    "Name": "Main Display",
-    "Protocol": ""
+    "zeroPadCommands": false,
+    "volumeUpperLimit": 100,
+    "volumeLowerLimit": 0,
+    "pollIntervalMs": 60000,
+    "pollVolume": false,
+    "coolingTimeMs": 15000,
+    "warmingTimeMs": 15000
   }
 }
 ```
@@ -44,7 +48,7 @@ This plugin is designed to work with Sharp Displays controlled via TCP/IP or RS-
   "key": "display-1",
   "uid": 4,
   "type": "sharpDisplay",
-  "name": "Main Display",
+  "name": "Display",
   "group": "display",
   "properties": {
     "control": {
@@ -59,20 +63,41 @@ This plugin is designed to work with Sharp Displays controlled via TCP/IP or RS-
         "bufferSize": 32768
       }
     },
-    "Enabled": true,
-    "Name": "Main Display",
-    "Protocol": ""
+    "zeroPadCommands": true,
+    "volumeUpperLimit": 100,
+    "volumeLowerLimit": 0,
+    "pollIntervalMs": 60000,
+    "pollVolume": false,
+    "coolingTimeMs": 15000,
+    "warmingTimeMs": 15000
   }
 }
 ```
 
-### Available Protocols
+### Pad Commands
+Optional boolean value to configure if commands should be padded with zeros. If not present defaults to padding commands with " " (\x20).
 
-| Protocol | Description           | Config Value |
-| -------- | --------------------- | ------------ |
-| PN-UH501 | For PN-UH501 Displays | PN-UH501     |
+#### Commands without Zero Pad
+Configuration
+```json
+"zeroPadCommands": false,
+```
+Command Structure
+```
+"POWR   1\x0D0A";
+```
 
-- All other values including an empty string will use the default command format.
+#### Commands with Zero Pad
+Configuration
+```json
+"zeroPadCommands": true,
+```
+Command Structure
+```
+"INPS0013\x0D\x0A";
+```
+
+
 
 ## License
 
