@@ -14,10 +14,8 @@ on:
 
 jobs:
   call-workflow:
-    uses: ./.github/workflows/essentialsplugins-betabuilds.yml
+    uses: PepperDash/workflow-templates/.github/workflows/essentialsplugins-betabuilds.yml
     secrets: inherit
     with: 
       branch: ${{ inputs.branch }}
       defualt-branch: $default-branch
-
-
