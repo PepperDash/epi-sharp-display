@@ -357,18 +357,10 @@ namespace PepperDash.Plugins.SharpDisplay
 
 			AddRoutingInputPort(
 				new RoutingInputPort(RoutingPortNames.HdmiIn1, eRoutingSignalType.Audio | eRoutingSignalType.Video,
-					eRoutingPortConnectionType.Hdmi, new Action(InputHdmi1), this), "9");
+					eRoutingPortConnectionType.Hdmi, new Action(InputHdmi1), this), "1");
 			AddRoutingInputPort(
-				new RoutingInputPort(RoutingPortNames.HdmiIn1PC, eRoutingSignalType.Audio | eRoutingSignalType.Video,
-					eRoutingPortConnectionType.Hdmi, new Action(InputHdmi2), this), "10");
-
-			AddRoutingInputPort(
-				new RoutingInputPort(RoutingPortNames.DviIn, eRoutingSignalType.Audio | eRoutingSignalType.Video,
-					eRoutingPortConnectionType.Dvi, new Action(InputDvi1), this), "7");
-
-			AddRoutingInputPort(
-				new RoutingInputPort(RoutingPortNames.VgaIn1, eRoutingSignalType.Audio | eRoutingSignalType.Video,
-					eRoutingPortConnectionType.Vga, new Action(InputVga1), this), "2");
+				new RoutingInputPort(RoutingPortNames.HdmiIn2, eRoutingSignalType.Audio | eRoutingSignalType.Video,
+					eRoutingPortConnectionType.Hdmi, new Action(InputHdmi2), this), "2");
 		}
 
 		public override bool CustomActivate()
@@ -428,7 +420,7 @@ namespace PepperDash.Plugins.SharpDisplay
 							UpdatePowerFb(data[0]);
 						break;
 					}
-				case "INPS":
+				case "IAVD":
 					{
 						if (data.Contains("OK"))
 							InputGet();
@@ -632,7 +624,7 @@ namespace PepperDash.Plugins.SharpDisplay
 		/// </summary>
 		public void InputHdmi1()
 		{
-			SendData("INPS", "9");
+			SendData("IAVD", "1");
 		}
 
 		/// <summary>
@@ -640,7 +632,7 @@ namespace PepperDash.Plugins.SharpDisplay
 		/// </summary>
 		public void InputHdmi2()
 		{
-			SendData("INPS", "10");
+			SendData("IAVD", "2");
 		}
 
 		/// <summary>
@@ -648,7 +640,7 @@ namespace PepperDash.Plugins.SharpDisplay
 		/// </summary>
 		public void InputHdmi3()
 		{
-			SendData("INPS", "7");
+			SendData("IAVD", "3");
 		}
 
 		/// <summary>
@@ -656,7 +648,7 @@ namespace PepperDash.Plugins.SharpDisplay
 		/// </summary>
 		public void InputDisplayPort1()
 		{
-			SendData("INPS", "1");
+			SendData("IAVD", "1");
 		}
 
 		/// <summary>
@@ -664,7 +656,7 @@ namespace PepperDash.Plugins.SharpDisplay
 		/// </summary>
 		public void InputDvi1()
 		{
-			SendData("INPS", "7");
+			SendData("IAVD", "7");
 		}
 
 		/// <summary>
@@ -672,7 +664,7 @@ namespace PepperDash.Plugins.SharpDisplay
 		/// </summary>
 		public void InputDvi2()
 		{
-			SendData("INPS", "1");
+			SendData("IAVD", "1");
 		}
 
 		/// <summary>
@@ -680,7 +672,7 @@ namespace PepperDash.Plugins.SharpDisplay
 		/// </summary>
 		public void InputVga1()
 		{
-			SendData("INPS","2");
+			SendData("IAVD","2");
 		}
 
 		/// <summary>
@@ -688,7 +680,7 @@ namespace PepperDash.Plugins.SharpDisplay
 		/// </summary>
 		public void InputToggle()
 		{
-			SendData("INPS", "0");
+			SendData("IAVD", "0");
 		}
 
 		/// <summary>
@@ -696,7 +688,7 @@ namespace PepperDash.Plugins.SharpDisplay
 		/// </summary>
 		public void InputGet()
 		{
-			SendData("INPS", "????");
+			SendData("IAVD", "????");
 		}
 
 		/// <summary>
