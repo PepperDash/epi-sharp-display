@@ -537,7 +537,7 @@ namespace PepperDash.Plugins.SharpDisplay
 		/// </summary>
 		public void MuteGet()
 		{
-			SendData("MUTE", "?");
+			SendData("MUTE", "????");
 		}
 
 		/// <summary>
@@ -545,7 +545,7 @@ namespace PepperDash.Plugins.SharpDisplay
 		/// </summary>
 		public void VolumeGet()
 		{
-			SendData("VOLM", "?");
+			SendData("VOLM", "????");
 		}
 
 		/// <summary>
@@ -696,7 +696,7 @@ namespace PepperDash.Plugins.SharpDisplay
 		/// </summary>
 		public void InputGet()
 		{
-			SendData("INPS", "?");
+			SendData("INPS", "????");
 		}
 
 		/// <summary>
@@ -800,7 +800,7 @@ namespace PepperDash.Plugins.SharpDisplay
 		/// </summary>
 		public void PowerGet()
 		{
-			SendData("POWR", "?");
+			SendData("POWR", "????");
 		}
 
 
