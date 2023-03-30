@@ -1,0 +1,96 @@
+Sharp RS232 Testing Session (115200)
+Tx: 
+	Rx: ERR
+Tx: 
+	Rx: ERR
+Tx: POWR   ?
+	Rx: ERR
+Tx: PWOR?
+	Rx: ERR
+Tx: POWR?
+	Rx: ERR
+Tx: POWR????
+	Rx: 1
+Tx: P
+	Rx: ERR
+Tx: RSPW????
+	Rx: 0001
+Tx: RSPW1
+	Rx: OK
+Tx: RSPW   1
+	Rx: ERR
+Tx: 
+	Rx: ERR
+Tx: INPT????
+	Rx: ERR
+Tx: IAVD?
+	Rx: ERR
+Tx: IAVD????
+	Rx: 1
+Tx: AVMD????
+	Rx: 7
+Tx: RSPW1000
+	Rx: ERR
+Tx: RSPW1
+	Rx: OK
+Tx: RSPW????
+	Rx: 0001
+Tx: 
+	Rx: ERR
+Tx: POWR?
+	Rx: ERR
+Tx: POWR????
+	Rx: 1
+Tx: POWR0
+	Rx: OK
+Tx: 
+	Rx: ERR
+Tx: 
+	Rx: ERR
+Tx: POWR1
+	Rx: OK
+Tx: 
+	Rx: ERR
+Tx: 
+	Rx: ERR
+Tx: BAUD0096
+Connection disconencted at 115200. restart at 9600 below
+
+Session after set BAUD to 9600
+
+Tx: 
+	Rx: ERR
+Tx: 
+	Rx: ERR
+Tx: POWR????
+	Rx: 1
+Tx: RSPW????
+	Rx: 0001
+Tx: IAVD????
+	Rx: 1
+Tx: IAVD2
+	Rx: OK
+Tx: 
+	Rx: ERR
+Tx: IAVD1
+	Rx: OK
+Tx: 
+	Rx: ERR
+Tx: VOLM????
+	Rx: 30
+Tx: VOLM00
+	Rx: OK
+Tx: VOLM????
+	Rx: 0
+Tx: MUTE????
+	Rx: 2
+Tx: 
+	Rx: ERR
+Tx: TVNM1
+	Rx: 4T-B80CJ1U-CT1U
+Tx: MNRD1
+	Rx: 80 4T-B US
+Tx: SWVN1
+	Rx: 1.19
+Tx: IPPV1
+	Rx: 1.000
