@@ -43,6 +43,7 @@ namespace PepperDash.Plugins.SharpDisplay
 		private ushort _volumeLevelForSig;
 		private bool _pollVolume;
 		private string _lastCommandSent;
+        private bool _isLeftJustified;
 
 		public SharpDisplayController(string key, string name, SharpDisplayPropertiesConfig config, IBasicCommunication comms)
 			: base(key, name)
@@ -65,6 +66,7 @@ namespace PepperDash.Plugins.SharpDisplay
 			_warmingTimeMs = props.WarmingTimeMs > 9999 ? props.WarmingTimeMs : 15000;
 
 			_pollVolume = props.PollVolume;
+            _isLeftJustified = true;// set true for testing porpoises
 
 			InputNumberFeedback = new IntFeedback(() => _inputNumber);
 
@@ -466,9 +468,20 @@ namespace PepperDash.Plugins.SharpDisplay
 			if (string.IsNullOrEmpty(cmdValue))
 				cmdValue = "?";
 
-			var data = ZeroPadCommands ?
-				string.Format("{0}{1,4:0}", cmd, cmdValue) :
-				string.Format("{0}{1,4:#}", cmd, cmdValue);
+            var param = "";
+            if (_isLeftJustified)
+            {
+                param = ZeroPadCommands ?
+                    string.Format("{0,-4:0}", cmdValue) :
+                    string.Format("{0,-4:#}", cmdValue);
+            }
+            else
+            {
+                param = ZeroPadCommands ?
+                    string.Format("{0,4:0}", cmdValue) :
+                    string.Format("{0,4:#}", cmdValue);
+            }
+            var data = string.Format("{0}{1}", cmd, param);
 
 			Communication.SendText(data + "\x0D\x0A");
 
