@@ -66,7 +66,7 @@ namespace PepperDash.Plugins.SharpDisplay
 			_warmingTimeMs = props.WarmingTimeMs > 9999 ? props.WarmingTimeMs : 15000;
 
 			_pollVolume = props.PollVolume;
-            _isLeftJustified = true;// set true for testing porpoises
+            _isLeftJustified = props.IsLeftJustified;
 
 			InputNumberFeedback = new IntFeedback(() => _inputNumber);
 

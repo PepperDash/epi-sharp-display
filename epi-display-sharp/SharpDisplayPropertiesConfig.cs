@@ -45,5 +45,11 @@ namespace PepperDash.Plugins.SharpDisplay
 		/// </summary>
 		[JsonProperty("pollVolume")]
 		public bool PollVolume { get; set; }
+
+        /// <summary>
+        /// Set Left(true) or Right(false) justification for command parameters
+        /// </summary>
+        [JsonProperty("isLeftJustified")]
+        public bool IsLeftJustified { get; set; }
 	}
 }
