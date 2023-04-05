@@ -43,6 +43,10 @@ namespace PepperDash.Plugins.SharpDisplay
 		private ushort _volumeLevelForSig;
 		private bool _pollVolume;
 		private string _lastCommandSent;
+        public bool ZeroPadCommands { get; private set; }
+        public bool PadCommands { get; private set; } 
+
+
 
 		public SharpDisplayController(string key, string name, SharpDisplayPropertiesConfig config, IBasicCommunication comms)
 			: base(key, name)
@@ -57,6 +61,7 @@ namespace PepperDash.Plugins.SharpDisplay
 				Debug.Console(0, this, Debug.ErrorLogLevel.Error, "Display configuration must be included");
 				return;
 			}
+            PadCommands = !props.NoPadding;
 			ZeroPadCommands = props.ZeroPadCommands;
 			_upperLimit = props.volumeUpperLimit;
 			_lowerLimit = props.VolumeLowerLimit;
@@ -74,7 +79,7 @@ namespace PepperDash.Plugins.SharpDisplay
 		public IBasicCommunication Communication { get; private set; }
 		public CommunicationGather PortGather { get; private set; }
 
-		public bool ZeroPadCommands { get; private set; }
+
 
 		public bool PowerIsOn
 		{
@@ -466,12 +471,23 @@ namespace PepperDash.Plugins.SharpDisplay
 			if (string.IsNullOrEmpty(cmdValue))
 				cmdValue = "?";
 
-			var data = ZeroPadCommands ?
-				string.Format("{0}{1,4:0}", cmd, cmdValue) :
-				string.Format("{0}{1,4:#}", cmd, cmdValue);
+            if (PadCommands)
+            {
+                if (ZeroPadCommands)
+                {
+                    cmdValue = cmdValue.PadLeft(4, '0');
+                }
+                else
+                {
+                    cmdValue = cmdValue.PadLeft(4);
+                }
 
+            }
+
+               var data = string.Format("{0}{1}", cmd, cmdValue);
+            
 			Communication.SendText(data + "\x0D\x0A");
-
+            Debug.Console(2, this, "SendData: {0}", data);
 			_lastCommandSent = cmd;
 			Debug.Console(1, this, "SendData _lastCommandSent: {0}", _lastCommandSent);
 		}
@@ -790,6 +806,10 @@ namespace PepperDash.Plugins.SharpDisplay
 			SendData("POWR", "?");
 		}
 
+        public void PowerRspw()
+        {
+            SendData("RSPW", "1");
+        }
 
 		/// <summary>
 		/// Toggle current power state for device
@@ -825,6 +845,8 @@ namespace PepperDash.Plugins.SharpDisplay
 		{
 			CrestronInvoke.BeginInvoke((o) =>
 			{
+                PowerRspw();
+                CrestronEnvironment.Sleep(2000);
 				PowerGet();
 				CrestronEnvironment.Sleep(2000);
 				InputGet();
