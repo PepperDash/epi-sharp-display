@@ -4,11 +4,19 @@ namespace PepperDash.Plugins.SharpDisplay
 {
 	public class SharpDisplayPropertiesConfig
 	{
+
+        // todo: next version make the padding settings more concise 
 		/// <summary>
-		/// Character used to pad the command, defaults to " " (\x20) if not defined
+		/// Character used to pad the command, defaults to space " " (\x20) if not defined
 		/// </summary>
 		[JsonProperty("zeroPadCommands")]
         public bool ZeroPadCommands { get; set; }
+
+        /// <summary>
+        /// Removes padding from command when true = POWR1, when false or not defined POWER0001 or POWR   1 depending on zeroPaddingCommands setting
+        /// </summary>
+        [JsonProperty("noPadding")]
+        public bool NoPadding { get; set; }
 
 		/// <summary>
 		/// Device volume upper limit, 100
