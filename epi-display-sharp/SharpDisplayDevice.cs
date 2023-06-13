@@ -43,6 +43,7 @@ namespace PepperDash.Plugins.SharpDisplay
 		private ushort _volumeLevelForSig;
 		private bool _pollVolume;
 		private string _lastCommandSent;
+        private bool _isLeftJustified;
         public bool ZeroPadCommands { get; private set; }
         public bool PadCommands { get; private set; } 
 
@@ -468,11 +469,13 @@ namespace PepperDash.Plugins.SharpDisplay
             {
                 if (ZeroPadCommands)
                 {
-                    cmdValue = cmdValue.PadLeft(4, '0');
+                    // cmdValue = cmdValue.PadLeft(4, '0');
+                    cmdValue = _isLeftJustified ? cmdValue.PadRight(4, '0') : cmdValue.PadLeft(4, '0');
                 }
                 else
                 {
-                    cmdValue = cmdValue.PadLeft(4);
+                    // cmdValue = cmdValue.PadLeft(4);
+                    cmdValue = _isLeftJustified ? cmdValue.PadRight(4) : cmdValue.PadLeft(4);
                 }
 
             }
