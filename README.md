@@ -31,6 +31,7 @@ This plugin is designed to work with Sharp Displays controlled via TCP/IP or RS-
       }
     },
     "zeroPadCommands": false,
+    "noPadding": false,
     "volumeUpperLimit": 100,
     "volumeLowerLimit": 0,
     "pollIntervalMs": 60000,
@@ -64,6 +65,7 @@ This plugin is designed to work with Sharp Displays controlled via TCP/IP or RS-
       }
     },
     "zeroPadCommands": true,
+    "noPadding": false,
     "volumeUpperLimit": 100,
     "volumeLowerLimit": 0,
     "pollIntervalMs": 60000,
@@ -94,7 +96,16 @@ Configuration
 ```
 Command Structure
 ```
-"INPS0013\x0D\x0A";
+"POWR0001\x0D\x0A";
+```
+#### Commands with No Padding
+Configuration
+```json
+"noPadding": true,
+```
+Command Structure
+```
+"POWR1\x0D\x0A";
 ```
 
 
