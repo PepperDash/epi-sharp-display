@@ -12,6 +12,10 @@ using PepperDash.Essentials.Core.Queues;
 using PepperDash.Essentials.Core.Routing;
 using PepperDash.Essentials.Devices.Displays;
 
+#if SERIES4
+using TwoWayDisplayBase = PepperDash.Essentials.Devices.Common.Displays.TwoWayDisplayBase;
+#endif
+
 namespace PepperDash.Plugins.SharpDisplay
 {
 	public class SharpDisplayController : TwoWayDisplayBase, IBasicVolumeWithFeedback, ICommunicationMonitor, 
