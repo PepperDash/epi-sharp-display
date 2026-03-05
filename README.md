@@ -129,3 +129,99 @@ To verify that the packages installed correctly, open the plugin solution in you
 ### Installing Different versions of PepperDash Core
 
 If you need a different version of PepperDash Core, use the command `nuget install .\packages.config -OutputDirectory .\packages -excludeVersion -Version {versionToGet}`. Omitting the `-Version` option will pull the version indicated in the packages.config file.
+<!-- START Minimum Essentials Framework Versions -->
+### Minimum Essentials Framework Versions
+
+- 1.9.1
+<!-- END Minimum Essentials Framework Versions -->
+<!-- START Config Example -->
+### Config Example
+
+```json
+{
+    "key": "GeneratedKey",
+    "uid": 1,
+    "name": "GeneratedName",
+    "type": "SharpDisplayProperties",
+    "group": "Group",
+    "properties": {
+        "zeroPadCommands": true,
+        "noPadding": true,
+        "volumeUpperLimit": 0,
+        "volumeLowerLimit": 0,
+        "pollIntervalMs": 0,
+        "coolingTimeMs": "SampleValue",
+        "warmingTimeMs": "SampleValue",
+        "pollVolume": true,
+        "isLeftJustified": true
+    }
+}
+```
+<!-- END Config Example -->
+<!-- START Supported Types -->
+
+<!-- END Supported Types -->
+<!-- START Join Maps -->
+
+<!-- END Join Maps -->
+<!-- START Interfaces Implemented -->
+### Interfaces Implemented
+
+- IBasicVolumeWithFeedback
+- ICommunicationMonitor
+- IInputHdmi1
+- IInputHdmi2
+- IInputHdmi3
+- IInputDisplayPort1
+- IInputVga1
+- IBridgeAdvanced
+<!-- END Interfaces Implemented -->
+<!-- START Base Classes -->
+### Base Classes
+
+- TwoWayDisplayBase
+<!-- END Base Classes -->
+<!-- START Public Methods -->
+### Public Methods
+
+- public void SetVolume(ushort level)
+- public void MuteOn()
+- public void MuteOff()
+- public void MuteToggle()
+- public void VolumeDown(bool pressRelease)
+- public void VolumeUp(bool pressRelease)
+- public void LinkToApi(BasicTriList trilist, uint joinStart, string joinMapKey, EiscApiAdvanced bridge)
+- public void MuteGet()
+- public void VolumeGet()
+- public void UpdateVolumeFb(string s)
+- public void UpdateMuteFb(string s)
+- public void ListRoutingInputPorts()
+- public void InputHdmi1()
+- public void InputHdmi2()
+- public void InputHdmi3()
+- public void InputDisplayPort1()
+- public void InputDvi1()
+- public void InputDvi2()
+- public void InputVga1()
+- public void InputToggle()
+- public void InputGet()
+- public void UpdateInputFb(string s)
+- public void PowerGet()
+- public void PowerRspw()
+- public void UpdatePowerFb(string s)
+- public void StatusGet()
+<!-- END Public Methods -->
+<!-- START Bool Feedbacks -->
+### Bool Feedbacks
+
+- MuteFeedback
+<!-- END Bool Feedbacks -->
+<!-- START Int Feedbacks -->
+### Int Feedbacks
+
+- InputNumberFeedback
+- VolumeLevelFeedback
+<!-- END Int Feedbacks -->
+<!-- START String Feedbacks -->
+
+<!-- END String Feedbacks -->
